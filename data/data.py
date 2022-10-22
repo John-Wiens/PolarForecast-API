@@ -1,14 +1,17 @@
-import tba
-import datacache
+import data.tba as tba
+import data.datacache as datacache
 
 
 # Gets the latest data for the supplied key, if the data not available locally try to get it on the blue alliance
-def get(key:str, update:bool = True, tba=False) -> dict:
+def get(key:str, update:bool = True, from_tba=False) -> dict:
     result = datacache.get_json(key)
-    if result is None and tba:
-        tba_data, etag = tba.get(key)
-        datacache.cache_json(key, tba_data, etag=etag)
-        return tba_data
+    if result is None:
+        if from_tba:
+            tba_data, etag = tba.get(key)
+            datacache.cache_json(key, tba_data, etag=etag)
+            return tba_data
+        else:
+            return None
     elif update and result['metadata']['tba']:
         tba_data, etag = tba.get(key, etag=result['metadata']['etag'])
         if tba_data is not None and etag is not None:
@@ -22,10 +25,6 @@ def get(key:str, update:bool = True, tba=False) -> dict:
 # Stores the Supplied Dictionary in the Redis Cache
 def store(key:str, data:dict) -> bool:
     return cache_json(key, data)
-
-# Updates the local storage cache with the latest data
-def update_data():
-    pass
 
 
 if __name__ == '__main__':
