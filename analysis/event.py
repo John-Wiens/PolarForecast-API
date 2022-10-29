@@ -1,7 +1,7 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
 from data.data import get, store
-from analysis.solver import smart_solve
+from analysis.solver import smart_solve, linked_solve
 
 class Event():
 
@@ -22,38 +22,51 @@ class Event():
 
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
-        self.tba_matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)
-        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)
+        self.tba_matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)['data']
+        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)['data']
 
 
-        matches = self.get_sanitized_matches()
-        teams = self.get_team_lookup()
+        matches = self.get_sanitized_matches(self.tba_matches)
+        played_matches = self.get_played_matches(matches)
+        teams = self.get_team_lookup(self.tba_teams)
 
         smart_solve_stats = self.get_stat_names(self.get_stats_by_solver("smart_solve"))
-        smart_solve(matches,teams,smart_solve_stats)
+        link_solve_stats = self.get_stats_by_solver("linked")
+        
+        teams = smart_solve(played_matches, teams, smart_solve_stats)
+        teams = linked_solve(played_matches, teams, link_solve_stats)
 
 
-    def get_sanitized_matches(self):
+
+
+    def get_sanitized_matches(self, matches):
         if MATCH_SANITIZATION:
             good_matches = []
             for match in self.tba_matches:
                 if self.game.validate_match(match):
                     good_matches.append(match)
                 
-            if len(good_matches) < 0.9 * len(self.tba_matches):
+            if len(good_matches) < 0.9 * len(matches):
                 print("Event {self.year}{self.event_key} has failed to achieve 90% Data integrity. Predictions may be off.")
                 self.data_integrity_check = "failed"
             return good_matches
         else:
-            return self.tba_matches
+            return matches
+
+    def get_played_matches(self, matches):
+        played_matches = []
+        for match in matches:
+            if "post_result_time" in match and match["post_result_time"] > 0:
+                played_matches.append(match)
+        return played_matches
 
 
 
     # Converts TBA Team listing into a dictonary mapping team keys to index's. 
-    def get_team_lookup(self):
+    def get_team_lookup(self, teams):
         team_lookup = {}
         index = 0
-        for team in self.tba_teams['data']:
+        for team in teams:
             team_lookup[team['key']] = {'index':index}
             index +=1
 
@@ -73,5 +86,6 @@ class Event():
         names = []
         for stat in stats:
             names.append(stat.stat_key)
+        return names
 
 

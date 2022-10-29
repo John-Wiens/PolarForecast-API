@@ -37,10 +37,10 @@ def get_json(key:str)->dict:
             return None
     except ConnectionError as e:
         print("Unable to access Redis cache. No connection to cache.", e)
-        return False
+        return None
     except Exception as e:
         print("An unknown error occured when trying to retrieve data from the Redis cache", e)
-        return False
+        return None
 
 
 if __name__ == '__main__':
