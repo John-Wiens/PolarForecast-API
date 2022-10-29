@@ -1,6 +1,7 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
 from data.data import get, store
+from analysis.solver import smart_solve
 
 class Event():
 
@@ -16,44 +17,35 @@ class Event():
         self.game = game()
         
 
-        self.matches = None
+        self.tba_matches = None
         self.data_integrity_check = "unknown"
 
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
-        self.matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)
-        self.teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)
+        self.tba_matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)
+        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)
 
 
-        
-        
-        
-        team_lookup = self.get_team_lookup()
-        unlinked_stats = self.get_stats_by_key("unlinked")
-        linked_stats = self.get_stats_by_key("linked")
+        matches = self.get_sanitized_matches()
+        teams = self.get_team_lookup()
 
-
-        
-
-
-
-
-        pass
+        smart_solve_stats = self.get_stat_names(self.get_stats_by_solver("smart_solve"))
+        smart_solve(matches,teams,smart_solve_stats)
 
 
     def get_sanitized_matches(self):
         if MATCH_SANITIZATION:
             good_matches = []
-            for match in self.matches:
+            for match in self.tba_matches:
                 if self.game.validate_match(match):
                     good_matches.append(match)
                 
-            if len(good_matches) < 0.9 * len(self.matches):
+            if len(good_matches) < 0.9 * len(self.tba_matches):
                 print("Event {self.year}{self.event_key} has failed to achieve 90% Data integrity. Predictions may be off.")
                 self.data_integrity_check = "failed"
             return good_matches
         else:
-            return self.matches
+            return self.tba_matches
 
 
 
@@ -61,7 +53,7 @@ class Event():
     def get_team_lookup(self):
         team_lookup = {}
         index = 0
-        for team in self.teams['data']:
+        for team in self.tba_teams['data']:
             team_lookup[team['key']] = {'index':index}
             index +=1
 
@@ -69,9 +61,17 @@ class Event():
 
 
     # Returns a list of stats that use the given solution strategy
-    def get_stats_by_key(self, key):
+    def get_stats_by_solver(self, solver):
         stats = []
         for stat in self.game.stats:
-            if stat.solve_strategy == key:
+            if stat.solve_strategy == solver:
                 stats.append(stat)
+        return stats
+
+
+    def get_stat_names(self, stats):
+        names = []
+        for stat in stats:
+            names.append(stat.stat_key)
+
 

@@ -3,7 +3,7 @@
 
 # Class to Encapsulate the possible ways that a given metric can be solved for. 
 class Stat():
-    def __init__(self, stat_key, var_name = None, solve_strategy='unlinked', display_name=None, report_stat = False):
+    def __init__(self, stat_key, var_name = None, solve_strategy='smart_solve', display_name=None, report_stat = False):
         self.stat_key = stat_key
         
         self.solve_strategy = solve_strategy
