@@ -31,11 +31,31 @@ def parse_solution(solution, teams, stats):
     return teams
 
 def linked_solve(matches, teams, stats):
-    for match in matches:
-        for stat in stats:
-            for i in range(0,3):
-                pass
-    pass
+    for stat in stats:
+        for match in matches:
+            list_name = stat.stat_key+"_list"
+            for i in range(0, 3):
+                blue_key = match['alliances']['blue']['team_keys'][i]
+                red_key = match['alliances']['red']['team_keys'][i]
+
+                blue_value = stat.mapper.get(match['score_breakdown']['blue'][stat.linked_key+str(i+1)],0)
+                red_value = stat.mapper.get(match['score_breakdown']['red'][stat.linked_key+str(i+1)],0)
+
+                if list_name in teams[blue_key]:
+                    teams[blue_key][list_name].append(blue_value)
+                else:
+                    teams[blue_key][list_name] = [blue_value]
+                if list_name in teams[red_key]:
+                    teams[red_key][list_name].append(red_value)
+                else:
+                    teams[red_key][list_name] = [red_value]
+
+        for team in teams.values():
+            if len(team[list_name]) > 0:
+                team[stat.stat_key] = sum(team[list_name]) / len(team[list_name])
+            else:
+                team[stat.stat_key] = 0
+    return teams
 
 
 def build_score_matrix(matches, teams, stats):

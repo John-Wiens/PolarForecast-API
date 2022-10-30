@@ -37,6 +37,10 @@ class Event():
         teams = linked_solve(played_matches, teams, link_solve_stats)
 
 
+        for team in teams:
+            print(team, teams[team])
+
+
 
 
     def get_sanitized_matches(self, matches):
