@@ -1,7 +1,9 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
 from data.data import get, store
-from analysis.solver import smart_solve, linked_solve
+from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
+
+
 
 class Event():
 
@@ -30,17 +32,27 @@ class Event():
         played_matches = self.get_played_matches(matches)
         teams = self.get_team_lookup(self.tba_teams)
 
-        smart_solve_stats = self.get_stat_names(self.get_stats_by_solver("smart_solve"))
-        link_solve_stats = self.get_stats_by_solver("linked")
+        smart_solve_stats = self.get_stat_names(self.get_stats_by_solver(SMART_SOLVER))
+        link_solve_stats = self.get_stats_by_solver(LINKED_SOLVER)
         
+        # Precompute Direct Stats
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
 
+        for stat in self.game.stats:
+            if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
+                continue
+            elif stat.solve_strategy == SUM_SOLVER:
+                teams = sum_solve(teams, stat)
+                pass
+            elif stat.solve_strategy == CUSTOM_SOLVER:
+                teams = stat.solve_function(played_matches, teams, stat)
+                pass
+            else:
+                print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
 
         for team in teams:
             print(team, teams[team])
-
-
 
 
     def get_sanitized_matches(self, matches):

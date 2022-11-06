@@ -2,6 +2,11 @@ import numpy as np
 
 from scipy.optimize import nnls
 
+SMART_SOLVER = 'smart_solve'
+LINKED_SOLVER = 'linked'
+SUM_SOLVER = 'sum'
+CUSTOM_SOLVER = 'custom'
+
 def smart_solve(matches, teams, stats):
     num_equations = 2 * len(matches) # Each match produces 2 equations (red and blue)
     num_variables = min(len(teams), 6 * len(matches)) # Each match loads 6 new teams into the system, until all teams have played. 
@@ -57,6 +62,15 @@ def linked_solve(matches, teams, stats):
                 team[stat.stat_key] = 0
     return teams
 
+def sum_solve(teams, stat):
+    for team in teams.values():
+        total = 0
+        for key in stat.component_stats:
+            total += team[key]
+
+        team[stat.stat_key] = total
+
+    return teams
 
 def build_score_matrix(matches, teams, stats):
     num_teams = len(teams)

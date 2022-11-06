@@ -1,5 +1,5 @@
 from games.frc_game import FRCGame
-from analysis.stat import Stat, LinkedStat
+from analysis.stat import Stat, LinkedStat, SumStat
 
 
 
@@ -7,7 +7,8 @@ class RapidReact2022(FRCGame):
     def __init__(self):
         self.stats = [
             Stat('autoCargoLowerBlue'),
-            LinkedStat('autoTaxi','taxiRobot', {"Yes":2,"No":0})
+            LinkedStat('autoTaxi','taxiRobot', {"Yes":2,"No":0}),
+            SumStat('auto', ['autoCargoLowerBlue', 'autoTaxi'])
         ]
 
         self.rp_functions = [
