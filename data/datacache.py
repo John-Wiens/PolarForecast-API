@@ -15,19 +15,6 @@ def is_cache_available()->bool:
         print("An unknown error occured when trying to ping the Redis cache.", e)
         return False
 
-def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=time.time(), tba:bool=False)->bool:
-    try:
-        dictionary['metadata'] = {'last_modified':last_modified, 'etag': etag,'tba':tba}
-        d = json.dumps(dictionary)
-        success = redis.set(key, d)
-        return success
-    except ConnectionError as e:
-        print("Unable to access Redis cache. No connection to cache.", e)
-        return False
-    except Exception as e:
-        print("An unknown error occured when trying to store data in the Redis cache", e)
-        return False
-
 def get_json(key:str)->dict:
     try:
         data = redis.get(key)
@@ -41,6 +28,42 @@ def get_json(key:str)->dict:
     except Exception as e:
         print("An unknown error occured when trying to retrieve data from the Redis cache", e)
         return None
+
+def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=time.time(), tba:bool=False, index=False)->bool:
+    try:
+
+        dictionary['metadata'] = {'last_modified':last_modified, 'etag': etag,'tba':tba}
+        d = json.dumps(dictionary)
+        success = redis.set(key, d)
+
+        
+        if index and success:
+            sub_key = key[:key.rindex("/")]
+            index_record = get_json(sub_key)
+            if index_record is not None:
+                if key not in index_record['data']['keys']:
+                    index_record['data']['keys'].append(key)
+                else:
+                    index_record['data']['keys'] = [key]
+                cache_json(sub_key, index_record, index = False)
+            else:
+                print("Creating new Index: ", sub_key)
+                index_record = {
+                    "data":{
+                        "keys":[sub_key]
+                    }
+                }
+                cache_json(sub_key, index_record, index = False)
+        
+        return success
+    except ConnectionError as e:
+        print("Unable to access Redis cache. No connection to cache.", e)
+        return False
+    except Exception as e:
+        print("An unknown error occured when trying to store data in the Redis cache", e)
+        return False
+
+
 
 
 if __name__ == '__main__':

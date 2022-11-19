@@ -32,13 +32,13 @@ def nnls_solve(matches, teams, stats):
 def parse_solution(solution, teams, stats):
     for team in teams.values():
         for index, stat in enumerate(stats):
-            team[stat] = solution[team['index']][index]
+            team[stat] = solution[team['_index']][index]
     return teams
 
 def linked_solve(matches, teams, stats):
     for stat in stats:
         for match in matches:
-            list_name = stat.stat_key+"_list"
+            list_name = "_"+stat.stat_key+"_list"
             for i in range(0, 3):
                 blue_key = match['alliances']['blue']['team_keys'][i]
                 red_key = match['alliances']['red']['team_keys'][i]
@@ -88,8 +88,8 @@ def build_score_matrix(matches, teams, stats):
             stat_count +=1
         
         for j in range(0,3):
-            blue_index = teams[match['alliances']['blue']['team_keys'][j]]['index']
-            red_index = teams[match['alliances']['red']['team_keys'][j]]['index']
+            blue_index = teams[match['alliances']['blue']['team_keys'][j]]['_index']
+            red_index = teams[match['alliances']['red']['team_keys'][j]]['_index']
             team_array[i][blue_index] = 1
             team_array[num_matches+i][red_index] = 1
             

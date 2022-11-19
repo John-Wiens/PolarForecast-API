@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
+from data.data import get, clean_response, get_from_index
+
 app = FastAPI()
 
 run_analysis = True
@@ -28,29 +30,18 @@ app.add_middleware(
 def read_root():
     return {"Polar": "Forecast"}
 
-@app.get("/events")
-def read_item():
-    return 501
 
-@app.get("/teams/{team}")
-def read_item(team: str):
-    return 501
+@app.get("/{year}/{event}/{team}")
+def read_item(year:int, event:str, team: str, include_metadata:bool = False):
+    key = f"/{year}/{event}/{team}"
+    response = clean_response(get(key, update = False, from_tba=False))
+    return response
 
-@app.get("/events/{event_key}")
-def read_item(event_key: str):
-    return 501
-
-@app.get("/events/{event_key}/rankings")
-def read_item(event_key: str):
-    return 501
-
-@app.get("/events/{event_key}/matches/{match_key}")
-def read_item(event_key: str, match_key: str):
-    return 501
-
-@app.get("/events/{event_key}/matches")
-def read_item(event_key: str, comp_level: str = None):
-    return 501
+@app.get("/{year}/{event}")
+def read_item(year:int, event:str):
+    key = f"/{year}/{event}"
+    response = get_from_index(key)
+    return response
 
 @app.on_event("startup")
 @repeat_every(seconds=TBA_POLLING_INTERVAL)

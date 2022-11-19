@@ -12,6 +12,7 @@ class Event():
     game: FRCGame
     matches_request_base:str = "/event/{}{}/matches"
     teams_request_base:str = "/event/{}{}/teams"
+    team_key_base: str = "/{year}/{event}/{team}"
 
     def __init__(self, year:int, event_key:str, game:FRCGame):
         self.year = year
@@ -25,9 +26,11 @@ class Event():
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
         self.tba_matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)['data']
-        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)['data']
+        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)['data']        
+        
 
-
+    # Update Team Performances Based on Latest available TBA Data
+    def update_team_information(self):
         matches = self.get_sanitized_matches(self.tba_matches)
         played_matches = self.get_played_matches(matches)
         teams = self.get_team_lookup(self.tba_teams)
@@ -52,7 +55,8 @@ class Event():
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
 
         for team in teams:
-            print(team, teams[team])
+            key = self.team_key_base.format(year = self.year, event=self.event_key, team=team)
+            store(key, teams[team], index=True)
 
 
     def get_sanitized_matches(self, matches):
@@ -78,12 +82,13 @@ class Event():
 
 
 
-    # Converts TBA Team listing into a dictonary mapping team keys to index's. 
+    # Converts TBA Team listing into a dictonary mapping team keys to index's.
+    # Adds in Team keys to the mapping to preserve data when compressed to list
     def get_team_lookup(self, teams):
         team_lookup = {}
         index = 0
         for team in teams:
-            team_lookup[team['key']] = {'index':index}
+            team_lookup[team['key']] = {'key':team['key'], '_index':index}
             index +=1
 
         return team_lookup
