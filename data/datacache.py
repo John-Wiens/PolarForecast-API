@@ -31,12 +31,10 @@ def get_json(key:str)->dict:
 
 def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=time.time(), tba:bool=False, index=False)->bool:
     try:
-
         dictionary['metadata'] = {'last_modified':last_modified, 'etag': etag,'tba':tba}
         d = json.dumps(dictionary)
         success = redis.set(key, d)
 
-        
         if index and success:
             sub_key = key[:key.rindex("/")]
             index_record = get_json(sub_key)

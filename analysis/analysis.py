@@ -1,6 +1,7 @@
 from config import FRC_GAMES
 from data.data import get, store
 from analysis.event import Event
+from games.frc_game import FRCGame
 
 
 
@@ -14,15 +15,23 @@ def update():
     pass
 
 
+def lookup_game(year: int, event_key:str) -> FRCGame:
+    if year in FRC_GAMES:
+        return FRC_GAMES[year]
+    elif year + "_" + event_key in FRC_GAMES:
+        print("Heads up, The desired event is showing up as a possible custom game. This featureset hasn't been tested yet.")
+        return FRC_GAMES[year+"_"+event_key]
+    else:
+        print(f"No valid Ruleset found for Year: {year}. Either Polar Forecast cannot handle this game, or it is disabled.")
+        return None
+
 
 
 def update_event(year, event_key):
-    if year in FRC_GAMES:
-        event = Event(year, event_key, FRC_GAMES[year])
+    game = lookup_game(year, event_key)
+    if game is not None:
+        event = Event(year, event_key, game)
         event.update()
-    else:
-        print(f"No valid Ruleset found for Year: {year}. Either Polar Forecast cannot handle this game, or it is disabled.")
-
 
 
 if __name__ == '__main__':

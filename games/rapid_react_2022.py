@@ -1,5 +1,5 @@
 from games.frc_game import FRCGame
-from analysis.stat import Stat, LinkedStat, SumStat
+from analysis.stat import Stat, LinkedStat, SumStat, CustomStat
 
 
 
@@ -8,7 +8,8 @@ class RapidReact2022(FRCGame):
         self.stats = [
             Stat('autoCargoLowerBlue'),
             LinkedStat('autoTaxi','taxiRobot', {"Yes":2,"No":0}),
-            SumStat('auto', ['autoCargoLowerBlue', 'autoTaxi'])
+            SumStat('auto', ['autoCargoLowerBlue', 'autoTaxi'], report_stat=True),
+            CustomStat('rank', self.assign_ranks, report_stat=True)
         ]
 
         self.rp_functions = [
@@ -16,10 +17,17 @@ class RapidReact2022(FRCGame):
             self.get_ball_rp,
         ]
 
+    # Assigns Event Rankings to all the Teams at the event
+    def assign_ranks(self, played_matches:list, teams:list, stat:dict, rankings:dict)-> dict:
+        for rank in rankings['rankings']:
+            teams[rank['team_key']]['rank'] = rank['rank']
+        return teams
+
     def validate_match(self, match:dict) -> bool:
         return True
 
     def predict_match(self, match:dict) -> dict:
+        print("Predicting Match")
         return {}
 
     def get_climb_rp(self, match:dict) -> tuple:

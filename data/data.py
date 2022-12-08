@@ -44,7 +44,7 @@ def store(key:str, data:dict, index = False) -> bool:
 
 # Removes metadata and solver data from response
 def clean_response(data:dict, remove_metadata:bool = True, remove_intermediate:bool = True) -> dict:
-    if remove_metadata:
+    if remove_metadata and 'metadata' in data:
         del data['metadata']
     if remove_intermediate:
         remove_keys = []
