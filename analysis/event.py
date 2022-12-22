@@ -54,6 +54,9 @@ class Event():
             else:
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
 
+        save_team_stats(teams, stats)
+
+    def save_team_stats(teams, stats):
         for team in teams:
             for stat in self.game.stats:
                 if not stat.report_stat:
