@@ -11,7 +11,7 @@ class FRCGame():
     stats = []
     game_name = "Generic FRC Game"
 
-    def __init__(self):
+    def __init__(self, year, event_key):
         pass
 
     # Returns true if the match is , should be overridden by each years individual game
@@ -20,7 +20,7 @@ class FRCGame():
         return True
 
 
-    def predict_match(self, match:dict) -> dict:
+    def predict_match(self, match:dict, teams:dict) -> dict:
         print("Match Prediction has not been implemented for this game.")
         return {}
     

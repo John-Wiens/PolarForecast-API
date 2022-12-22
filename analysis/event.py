@@ -1,6 +1,6 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
-from data.data import get, store
+from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team
 from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
 
 
@@ -10,10 +10,6 @@ class Event():
     year: int
     event_key: str
     game: FRCGame
-    matches_request_base:str = "/event/{}{}/matches"
-    teams_request_base:str = "/event/{}{}/teams"
-    ranking_request_base:str = "/event/{}{}/rankings"
-    team_key_base: str = "/{year}/{event}/{team}"
 
     def __init__(self, year:int, event_key:str, game:FRCGame):
         self.year = year
@@ -24,10 +20,11 @@ class Event():
 
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
-        self.tba_matches = get(self.matches_request_base.format(self.year, self.event_key), from_tba=True)['data']
-        self.tba_teams = get(self.teams_request_base.format(self.year, self.event_key), from_tba=True)['data']        
-        self.tba_rankings = get(self.ranking_request_base.format(self.year, self.event_key), from_tba=True)['data']
-        self.update_team_info()
+        self.tba_matches = get_year_event_matches_tba(self.year, self.event_key)
+        self.tba_teams = get_year_event_teams_tba(self.year, self.event_key)
+        self.tba_rankings = get_year_event_rankings_tba(self.year, self.event_key)
+        self.teams = self.update_team_info()
+        self.update_match_predictions()
 
     # Update Team Performances Based on Latest available TBA Data
     def update_team_info(self):
@@ -54,15 +51,21 @@ class Event():
             else:
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
 
-        save_team_stats(teams, stats)
+        self.save_team_stats(teams, self.game.stats)
+        return teams
 
-    def save_team_stats(teams, stats):
+    def update_match_predictions(self):
+        for match in self.tba_matches:
+            self.game.predict_match(match, self.teams)
+
+    def save_team_stats(self, teams, stats):
         for team in teams:
-            for stat in self.game.stats:
+            for stat in stats:
                 if not stat.report_stat:
                     del teams[team][stat.stat_key]
-            key = self.team_key_base.format(year = self.year, event=self.event_key, team=team)
-            store(key, teams[team], index=True)
+            #key = self.team_key_base.format(year = self.year, event=self.event_key, team=team)
+            #store(key, teams[team], index=True)
+            store_year_event_team(self.year, self.event_key, team, teams[team])
 
     def get_sanitized_matches(self, matches):
         if MATCH_SANITIZATION:

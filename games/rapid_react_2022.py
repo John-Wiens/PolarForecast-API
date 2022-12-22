@@ -26,9 +26,21 @@ class RapidReact2022(FRCGame):
     def validate_match(self, match:dict) -> bool:
         return True
 
-    def predict_match(self, match:dict) -> dict:
-        print("Predicting Match")
+    def predict_match(self, match:dict, teams:dict) -> dict:
+        print("Predicting Match", match)
+        # prediction = []
+        # if(match.get('post_result_time',0) != 0):
+        #     predict_alliance('blue', match, teams)
+            
+        # else:
+        #     pass
         return {}
+
+    def predict_alliance(self, color:str, match:dict, teams:dict):
+        # for team_key in match.get('alliances',{}).get('blue',{}).get(team_keys,[]):
+        #         prediction[f"{color}_score"] = teams.get(teak_key,{}).get()
+        pass       
+
 
     def get_climb_rp(self, match:dict) -> tuple:
         return (0,0)

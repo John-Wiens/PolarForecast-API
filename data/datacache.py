@@ -5,6 +5,9 @@ import config
 
 redis = redis.Redis(host = config.REDIS_HOST, port = config.REDIS_PORT)
 
+def get_index_key(key:str):
+    return key[:key.rindex("/")] + "/index"
+
 def is_cache_available()->bool:
     try:
         return redis.ping()
@@ -34,9 +37,8 @@ def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=t
         dictionary['metadata'] = {'last_modified':last_modified, 'etag': etag,'tba':tba}
         d = json.dumps(dictionary)
         success = redis.set(key, d)
-
         if index and success:
-            sub_key = key[:key.rindex("/")]
+            sub_key = get_index_key(key)
             index_record = get_json(sub_key)
             if index_record is not None:
                 if key not in index_record['data']['keys']:
@@ -59,6 +61,7 @@ def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=t
         return False
     except Exception as e:
         print("An unknown error occured when trying to store data in the Redis cache", e)
+        print(f"Issue Caused while storing key: {key}, Data: {dictionary}")
         return False
 
 
