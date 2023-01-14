@@ -33,7 +33,7 @@ def get(endpoint:str, etag:str="") -> tuple:
         elif response.status_code == 304:
             return None, response.headers['ETag']
         else:
-            print("The Blue Alliance API responded with Unexpected Error Code:", response.status_code, response.text)
+            print("The Blue Alliance API responded with Unexpected Error Code:", response.status_code, response.text, "for endpoint: ", endpoint)
     except Exception as e:
         print("An Unknown Exception has occured when pulling data from TBA", e)
 
