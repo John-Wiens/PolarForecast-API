@@ -5,6 +5,7 @@ import data.datacache as datacache
 matches_request_base:str = "/event/{year}{event}/matches"
 teams_request_base:str = "/event/{year}{event}/teams"
 ranking_request_base:str = "/event/{year}{event}/rankings"
+event_list_request_base:str = "/events/{year}/simple"
 
 # Generated Data Locations
 team_key_base: str = "/year/{year}/event/{event}/teams/{team}"
@@ -97,6 +98,16 @@ def store_year_event_rankings_tba(year:int, event:str, data:dict):
     return store(key, data, index = False)
 
 
+# Blue Alliance Event Data
+def get_year_event_list_tba(year:int):
+    key = event_list_request_base.format(year = year)
+    return get(key, from_tba = True).get('data',{})
+
+def store_year_event_list_tba(year:int, data:dict):
+    key = event_list_request_base.format(year = year)
+    return store(key, data, index = False)
+
+
 # Team Event Performance Data
 def get_year_event_team(year:int, event:str, team:str):
     key = team_key_base.format(year=year, event=event, team=team)
@@ -109,6 +120,11 @@ def store_year_event_team(year:int, event:str, team:str, data:dict):
 def get_year_event_team_index(year:int, event:str, remove_metadata = True, remove_intermediate = True):
     key = datacache.get_index_key(team_key_base.format(year=year, event=event, team=""))
     return get_from_index(key, remove_metadata = remove_metadata, remove_intermediate = remove_intermediate)
+
+
+
+
+
 
 if __name__ == '__main__':
     print("Performing Data Access Test")

@@ -12,6 +12,9 @@ from games.frc_game import FRCGame
 
 # Function called by the polling API to perform generic updates on all of the events. 
 def update():
+    events = data.get()
+
+
     pass
 
 

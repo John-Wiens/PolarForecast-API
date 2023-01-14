@@ -58,6 +58,14 @@ def read_item(year:int, event:str):
         data.append(stat.get_stat_description())
     return {"data": data}
 
+
+@app.get("/events/{year}")
+def read_item(year:int):
+    response = source.get_year_event_list_tba(year)
+    if response is None:
+        raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    return response
+
 # @app.get("/{year}/{event}/tba_matches")
 # def read_item(year:int, event:str, include_metadata:bool = False):
 #     data = source.get_year_event_matches_tba(year, event)
