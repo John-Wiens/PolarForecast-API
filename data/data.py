@@ -1,5 +1,6 @@
 import data.tba as tba
 import data.datacache as datacache
+import redis
 
 # Blue Alliance sources for Data
 matches_request_base:str = "/event/{year}{event}/matches"
@@ -9,6 +10,8 @@ event_list_request_base:str = "/events/{year}/simple"
 
 # Generated Data Locations
 team_key_base: str = "/year/{year}/event/{event}/teams/{team}"
+search_keys_base: str = "/keys/{key}"
+search_key_lookup: str = "/keys"
 
 
 
@@ -69,57 +72,75 @@ def clean_response(data:dict, remove_metadata:bool = True, remove_intermediate:b
     return data
 
 # Blue Alliance Match Data
-def get_year_event_matches_tba(year:int, event:str):
+def get_year_event_matches_tba(year:int, event:str) -> dict:
     key = matches_request_base.format(year=year, event=event)
     return get(key, update = True, from_tba=True).get('data',{})
 
-def store_year_event_matches_tba(year:int, event:str, data:dict):
+def store_year_event_matches_tba(year:int, event:str, data:dict) -> bool:
     key = matches_request_base.format(year=year, event=event)
     return store(key, data, index = False)
 
 
 # Blue Alliance Team Data
-def get_year_event_teams_tba(year:int, event:str):
+def get_year_event_teams_tba(year:int, event:str) -> dict:
     key = teams_request_base.format(year=year, event=event)
     return get(key, update = True, from_tba=True).get('data',{})
 
-def store_year_event_teams_tba(year:int, event:str, data:dict):
+def store_year_event_teams_tba(year:int, event:str, data:dict) -> bool:
     key = teams_request_base.format(year=year, event=event)
     return store(key, data, index = False)
 
 
 # Blue Alliance Ranking Data
-def get_year_event_rankings_tba(year:int, event:str):
+def get_year_event_rankings_tba(year:int, event:str) -> dict:
     key = ranking_request_base.format(year=year, event=event)
     return get(key, update = True, from_tba=True).get('data',{})
 
-def store_year_event_rankings_tba(year:int, event:str, data:dict):
+def store_year_event_rankings_tba(year:int, event:str, data:dict) -> bool:
     key = ranking_request_base.format(year=year, event=event)
     return store(key, data, index = False)
 
 
 # Blue Alliance Event Data
-def get_year_event_list_tba(year:int):
+def get_year_event_list_tba(year:int) -> dict:
     key = event_list_request_base.format(year = year)
     return get(key, from_tba = True).get('data',{})
 
-def store_year_event_list_tba(year:int, data:dict):
+def store_year_event_list_tba(year:int, data:dict) -> bool:
     key = event_list_request_base.format(year = year)
     return store(key, data, index = False)
 
 
 # Team Event Performance Data
-def get_year_event_team(year:int, event:str, team:str):
+def get_year_event_team(year:int, event:str, team:str) -> dict:
     key = team_key_base.format(year=year, event=event, team=team)
     return get(key)
 
-def store_year_event_team(year:int, event:str, team:str, data:dict):
+def store_year_event_team(year:int, event:str, team:str, data:dict) -> bool:
     key = team_key_base.format(year=year, event=event, team=team)
     return store(key, data, index = True)
 
-def get_year_event_team_index(year:int, event:str, remove_metadata = True, remove_intermediate = True):
+def get_year_event_team_index(year:int, event:str, remove_metadata = True, remove_intermediate = True) -> dict:
     key = datacache.get_index_key(team_key_base.format(year=year, event=event, team=""))
     return get_from_index(key, remove_metadata = remove_metadata, remove_intermediate = remove_intermediate)
+
+
+# Update Search Keys
+def add_search_key(search_key:str, page: str) -> bool:
+    store_search_key(search_key, {"key": search_key, "page": page})
+
+def get_search_key(search_key:str) -> dict:
+    key = search_keys_base.format(key = search_key)
+    return get(key)
+
+def store_search_key(search_key:str, data:dict) -> bool:
+    key = search_keys_base.format(key=search_key)
+    return store(key, data, index = True)
+
+def get_all_search_keys() -> dict:
+    return datacache.get_data_with_key(search_key_lookup)
+    
+
 
 
 

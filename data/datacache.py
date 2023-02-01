@@ -65,6 +65,18 @@ def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=t
         return False
 
 
+def get_keys(index: str)->list:
+    return redis.scan_iter(f"{index}/*")
+
+def get_data_with_key(key:str) -> dict:
+    keys = get_keys(key)
+    data = redis.mget(keys)
+    response = []
+    for row in data:
+        row_json = json.loads(row)
+        del row_json['metadata']
+        response.append(row_json)
+    return {"data": response}
 
 
 if __name__ == '__main__':
