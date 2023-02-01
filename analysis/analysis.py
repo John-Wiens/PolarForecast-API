@@ -9,15 +9,6 @@ from games.frc_game import FRCGame
 
 
 
-
-# Function called by the polling API to perform generic updates on all of the events. 
-def update():
-    events = data.get()
-
-
-    pass
-
-
 def lookup_game(year: int, event_key:str) -> FRCGame:
     if year in FRC_GAMES:
         return FRC_GAMES[year]
@@ -35,6 +26,14 @@ def update_event(year, event_key):
     if game is not None:
         event = Event(year, event_key, game)
         event.update()
+
+
+# Function called by the polling API to perform generic updates on all of the events. 
+def update():
+    print("Updating Events")
+    update_event(2022, "code")
+    pass
+
 
 
 if __name__ == '__main__':
