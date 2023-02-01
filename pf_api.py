@@ -12,8 +12,9 @@ from analysis.analysis import lookup_game
 app = FastAPI()
 
 origins = [
+    "*",
     "http://localhost",
-    "http://localhost:4200",
+    "http://localhost:3000",
     "https://polarforecastfrc.com",
 ]
 
@@ -44,6 +45,7 @@ def read_item(year:int, event:str, include_metadata:bool = False, include_interm
     response = source.get_year_event_team_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    print(response)
     return response
 
 @app.get("/{year}/{event}/stat_description")
@@ -56,6 +58,7 @@ def read_item(year:int, event:str):
     
     for stat in game.stats:
         data.append(stat.get_stat_description())
+    print(data)
     return {"data": data}
 
 
@@ -64,6 +67,13 @@ def read_item(year:int):
     response = source.get_year_event_list_tba(year)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    return response
+
+@app.get("/search_keys")
+def read_item():
+    response = source.get_all_search_keys()
+    if response is None:
+        raise HTTPException(status_code=404, detail="Could not find the desired key in the database")
     return response
 
 # @app.get("/{year}/{event}/tba_matches")
@@ -79,5 +89,7 @@ def read_item(year:int):
 def update_database():
     if TBA_POLLING:
         analysis.update()
+
+
 
 

@@ -1,6 +1,6 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
-from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team
+from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key
 from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
 
 
@@ -17,6 +17,15 @@ class Event():
         self.game = game()
         self.tba_matches = None
         self.data_integrity_check = "unknown"
+        self.page = f"/data/event/{self.year}/{self.event_key}"
+        
+        
+        
+        add_search_key(f"{self.year}{self.event_key}", self.page)
+
+    def create_search_keys(self):
+        self.tba_event_info = get_year_event_matches_tba(self.year, self.event_key)
+
 
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
@@ -55,6 +64,7 @@ class Event():
         return teams
 
     def update_match_predictions(self):
+        matches = {}
         for match in self.tba_matches:
             self.game.predict_match(match, self.teams)
 
