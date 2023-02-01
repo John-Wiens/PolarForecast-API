@@ -3,7 +3,12 @@ import json
 import time
 import config
 
-redis = redis.Redis(host = config.REDIS_HOST, port = config.REDIS_PORT)
+if config.REDIS_STRICT:
+    print("Running REDIS in Strict Mode")
+    redis = redis.StrictRedis(host = config.REDIS_HOST, port = 6380, db=0, password=config.REDIS_PRIMARY_KEY, ssl = True)
+else:
+    redis = redis.Redis(host = config.REDIS_HOST, port = config.REDIS_PORT)
+
 
 def get_index_key(key:str):
     return key[:key.rindex("/")] + "/index"

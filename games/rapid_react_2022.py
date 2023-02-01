@@ -27,7 +27,7 @@ class RapidReact2022(FRCGame):
         return True
 
     def predict_match(self, match:dict, teams:dict) -> dict:
-        print("Predicting Match", match)
+        # print("Predicting Match", match)
         # prediction = []
         # if(match.get('post_result_time',0) != 0):
         #     predict_alliance('blue', match, teams)
