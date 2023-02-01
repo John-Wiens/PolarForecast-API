@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
 
-from analysis.analysis import lookup_game
+from analysis.analysis import lookup_game, update
 
 app = FastAPI()
 
@@ -88,7 +88,7 @@ def read_item():
 @repeat_every(seconds=TBA_POLLING_INTERVAL)
 def update_database():
     if TBA_POLLING:
-        analysis.update()
+        update()
 
 
 
