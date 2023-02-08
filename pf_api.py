@@ -2,7 +2,7 @@ import analysis.analysis
 import data.data as source
 
 from config import TBA_POLLING, TBA_POLLING_INTERVAL
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
@@ -43,6 +43,15 @@ def read_item(year:int, event:str, team: str, include_metadata:bool = False, inc
 @app.get("/{year}/{event}/stats")
 def read_item(year:int, event:str, include_metadata:bool = False, include_intermediate:bool = False ):
     response = source.get_year_event_team_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
+    if response is None:
+        raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    print(response)
+    return response
+
+@app.get("/{year}/{event}/predictions")
+def read_item(year:int, event:str, include_metadata:bool = False, include_intermediate:bool = False ):
+    response = source.get_match_prediction_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
+    print("First Entry: " ,response)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
     print(response)

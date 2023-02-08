@@ -65,8 +65,8 @@ def linked_solve(matches, teams, stats):
 def sum_solve(teams, stat):
     for team in teams.values():
         total = 0
-        for key in stat.component_stats:
-            total += team[key]
+        for key, weight in zip(stat.component_stats, stat.weights):
+            total += team[key] * weight
 
         team[stat.stat_key] = total
 
