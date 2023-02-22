@@ -5,6 +5,8 @@ from analysis.stat import Stat, LinkedStat, SumStat, CustomStat
 
 class RapidReact2022(FRCGame):
     def __init__(self):
+        self.preprocessors = []
+
         self.stats = [
             CustomStat('rank', self.assign_ranks, report_stat=True),
             Stat('autoCargoLowerBlue'),

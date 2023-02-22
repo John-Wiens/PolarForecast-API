@@ -69,12 +69,17 @@ class Event():
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings)
 
+        for preprocessor in self.game.preprocessors:
+            played_matches, teams = preprocessor(played_matches, teams)
+
         smart_solve_stats = self.get_stat_names(self.get_stats_by_solver(SMART_SOLVER))
         link_solve_stats = self.get_stats_by_solver(LINKED_SOLVER)
         
         # Precompute Direct Stats
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
+
+        
 
         for stat in self.game.stats:
             if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
@@ -83,6 +88,7 @@ class Event():
                 teams = sum_solve(teams, stat)
                 pass
             elif stat.solve_strategy == CUSTOM_SOLVER:
+                print("Custom Solve")
                 teams = stat.solve_function(played_matches, teams, stat, self.tba_rankings)
                 pass
             else:
@@ -123,7 +129,7 @@ class Event():
     def get_played_matches(self, matches):
         played_matches = []
         for match in matches:
-            if "post_result_time" in match and match["post_result_time"] > 0:
+            if "post_result_time" in match and match["post_result_time"] > 0: #and match['comp_level'] == 'qm'
                 played_matches.append(match)
         return played_matches
 
