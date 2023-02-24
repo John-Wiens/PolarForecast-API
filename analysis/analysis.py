@@ -31,7 +31,7 @@ def update_event(year, event_key):
 # Function called by the polling API to perform generic updates on all of the events. 
 def update():
     print("Updating Events")
-    update_event(2022, "code")
+    update_event(2023, "week0")
     pass
 
 

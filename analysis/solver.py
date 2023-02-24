@@ -95,4 +95,6 @@ def build_score_matrix(matches, teams, stats):
             
         i+=1
 
+    
+
     return team_array, score_array

@@ -40,6 +40,37 @@ def read_item(year:int, event:str, team: str, include_metadata:bool = False, inc
     response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
     return response
 
+@app.get("/{year}/{event}/{team}/matches")
+def read_item(year:int, event:str, team:str):
+    matches = source.get_year_event_team_matches(year, event, team)
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Could not find any matches.")
+    return {'data': matches}
+
+@app.get("/{year}/{event}/{team}/predictions")
+def read_item(year:int, event:str, team:str, include_metadata: bool = False, include_intermediate:bool = False):
+    matches = source.get_year_event_team_matches(year, event, team)
+    predictions = source.get_match_prediction_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Could not find any matches.")
+    if predictions is None:
+        raise HTTPException(status_code=404, detail="Could not find any predictions.")
+    
+    print(predictions)
+    results = []
+    for match in matches:
+        for prediction in predictions['data']:
+            if match.get('key','') == prediction.get('key','_'):
+                results.append(prediction)
+    return {'data': results}
+        
+
+    print("First Entry: " ,response)
+    if response is None:
+        raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    print(response)
+    return response
+
 @app.get("/{year}/{event}/stats")
 def read_item(year:int, event:str, include_metadata:bool = False, include_intermediate:bool = False ):
     response = source.get_year_event_team_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
@@ -51,11 +82,12 @@ def read_item(year:int, event:str, include_metadata:bool = False, include_interm
 @app.get("/{year}/{event}/predictions")
 def read_item(year:int, event:str, include_metadata:bool = False, include_intermediate:bool = False ):
     response = source.get_match_prediction_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
-    print("First Entry: " ,response)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
     print(response)
     return response
+
+
 
 @app.get("/{year}/{event}/stat_description")
 def read_item(year:int, event:str):
