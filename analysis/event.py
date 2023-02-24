@@ -1,6 +1,6 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
-from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key
+from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key, store_match_prediction
 from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
 
 
@@ -34,12 +34,43 @@ class Event():
         self.tba_rankings = get_year_event_rankings_tba(self.year, self.event_key)
         self.teams = self.update_team_info()
         self.update_match_predictions()
+        # self.ml()
+
+    def ml(self):
+        with open('ml.csv', 'w') as ml:
+            count = 0
+            for match in self.tba_matches:
+                count +=1
+                for team_key in match.get('alliances',{}).get('blue',{}).get('team_keys',[]):
+                    auto = self.teams.get(team_key,{}).get('auto',0)
+                    cargo = self.teams.get(team_key,{}).get('cargo',0)
+                    endgame = self.teams.get(team_key,{}).get('endgame',0)
+                    ml.write(f'{auto},{cargo},{endgame},')
+
+                for team_key in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
+                    auto = self.teams.get(team_key,{}).get('auto',0)
+                    cargo = self.teams.get(team_key,{}).get('cargo',0)
+                    endgame = self.teams.get(team_key,{}).get('endgame',0)
+                    ml.write(f'{auto},{cargo},{endgame},')
+
+
+
+
+                blue_score = match['score_breakdown']['blue']['totalPoints']
+                red_score = match['score_breakdown']['red']['totalPoints']
+                ml.write(f'{blue_score},{red_score}\n')
+                print(match['key'], blue_score, red_score, endgame)
+        
+        print(count)
 
     # Update Team Performances Based on Latest available TBA Data
     def update_team_info(self):
         matches = self.get_sanitized_matches(self.tba_matches)
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings)
+
+        for preprocessor in self.game.preprocessors:
+            played_matches, teams = preprocessor(played_matches, teams)
 
         smart_solve_stats = self.get_stat_names(self.get_stats_by_solver(SMART_SOLVER))
         link_solve_stats = self.get_stats_by_solver(LINKED_SOLVER)
@@ -48,6 +79,8 @@ class Event():
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
 
+        
+
         for stat in self.game.stats:
             if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
                 continue
@@ -55,24 +88,26 @@ class Event():
                 teams = sum_solve(teams, stat)
                 pass
             elif stat.solve_strategy == CUSTOM_SOLVER:
+                print("Custom Solve")
                 teams = stat.solve_function(played_matches, teams, stat, self.tba_rankings)
                 pass
             else:
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
-
+        
         self.save_team_stats(teams, self.game.stats)
         return teams
 
     def update_match_predictions(self):
         matches = {}
         for match in self.tba_matches:
-            self.game.predict_match(match, self.teams)
+            prediction = self.game.predict_match(match, self.teams)
+            store_match_prediction(self.year, self.event_key, prediction.get('key',''), prediction)
 
     def save_team_stats(self, teams, stats):
         for team in teams:
-            for stat in stats:
-                if not stat.report_stat:
-                    del teams[team][stat.stat_key]
+            # for stat in stats:
+                # if not stat.report_stat:
+                #     del teams[team][stat.stat_key]
             #key = self.team_key_base.format(year = self.year, event=self.event_key, team=team)
             #store(key, teams[team], index=True)
             store_year_event_team(self.year, self.event_key, team, teams[team])
@@ -94,7 +129,7 @@ class Event():
     def get_played_matches(self, matches):
         played_matches = []
         for match in matches:
-            if "post_result_time" in match and match["post_result_time"] > 0:
+            if "post_result_time" in match and match["post_result_time"] > 0: #and match['comp_level'] == 'qm'
                 played_matches.append(match)
         return played_matches
 

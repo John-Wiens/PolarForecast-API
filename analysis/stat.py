@@ -40,9 +40,18 @@ class LinkedStat(Stat):
 
 # Subclass of Stat, used for computing metrics that are the sum of other metrics. This is so common a shorthand class was made for it. 
 class SumStat(Stat):
-    def __init__(self, stat_key:str, component_stats:list, display_name:str=None, report_stat:str = False):
+    def __init__(self, stat_key:str, component_stats:list, weights:list = None, display_name:str=None, report_stat:str = False):
         super().__init__(stat_key, solve_strategy=SUM_SOLVER, display_name = display_name, report_stat = report_stat)
         self.component_stats = component_stats
+        
+        if weights is None:
+            weights = [1 for x in range(0, len(component_stats))]
+        elif len(weights) == len(component_stats):
+            self.weights = weights
+        else:
+            print(f"Provided Weights does not match length of Provided compoents for Stat: {self.stat_key}")
+
+        self.weights = weights
 
     def get_stat_specific_description(self) -> dict:
         return {
