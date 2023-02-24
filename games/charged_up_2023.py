@@ -271,28 +271,66 @@ class ChargedUp2023(FRCGame):
         return True
 
     def predict_alliance(self, color:str, match:dict, teams:dict, prediction:dict):
-        score = 0
-        cargo = 0
         endgame = 0
+        auto_charge_station = 0
+
+        auto_elements = 0
+
+        high_cubes = 0
+        mid_cubes = 0
+
+        high_cones = 0
+        mid_cones = 0
+
+        low = 0
         for team_key in match.get('alliances',{}).get(color,{}).get('team_keys',[]):
-            score = teams.get(team_key,{}).get('OPR',0)
-            cargo = teams.get(team_key,{}).get('cargo',0)
-            endgame = teams.get(team_key,{}).get('endgame',0)
+            team = teams.get(team_key,{})
+            auto_elements += team.get('autoHighCubes') + team.get('autoHighCones') + team.get('autoMidCubes') + team.get('autoMidCones') + team.get('autoLow')
+            high_cubes += team.get('autoHighCubes') + team.get('teleopHighCubes')
+            high_cones += team.get('autoHighCones') + team.get('teleopHighCones')
 
-        prediction[f"{color}_score"] = score
-        prediction[f"{color}_cargo"] = cargo
-        prediction[f"{color}_endgame"] = endgame
+            mid_cubes += team.get('autoMidCubes') + team.get('teleopMidCubes')
+            mid_cubes += team.get('autoMidCones') + team.get('teleopMidCones')
+
+            low += team.get('autoLow') + team.get('teleopLow')
+            endgame += team.get('endgamePoints')
+            auto_charge_station = max(auto_charge_station, team.get('autoChargeStation'))
+
+        
 
 
-        if cargo >= 20:
-            prediction[f"{color}_rp_1"] = 1
-        else:
-            prediction[f"{color}_cargo_rp"] = 0
+        if high_cubes > 3:
+            mid_cubes += high_cubes -3
+            high_cubes = 3
+        
+        if high_cones > 6:
+            mid_cones += high_cones - 6
+            high_cones = 6
+        
+        if mid_cubes > 3:
+            low += mid_cubes - 3
+            mid_cubes = 3
+        
+        if mid_cones > 6:
+            low += mid_cones - 6
+            mid_cones = 3
 
-        if endgame >= 20:
-            prediction[f"{color}_climb_rp"] = 1
-        else:
-            prediction[f"{color}_climb_rp"] = 0
+        if low > 9:
+            low = 9
+
+        high_links = int(min(high_cubes, high_cones / 2.0))
+        mid_links = int(min(mid_cubes, mid_cones / 2.0))
+        low_links = int(low / 3.0)
+
+        links = high_links + mid_links + low_links
+
+        score = links * 5 + (high_cubes + high_cones) * 5 + (mid_cubes + mid_cones) * 3 + low * 2 + auto_elements + auto_charge_station + endgame
+
+
+        prediction[f"{color}_score"] = round(score,2)
+
+        
+
 
     def predict_match(self, match:dict, teams:dict) -> dict:
         #print("Predicting Match", match)
@@ -305,6 +343,7 @@ class ChargedUp2023(FRCGame):
         self.predict_alliance('blue', match, teams, prediction)
         self.predict_alliance('red', match, teams, prediction)
 
+        # print(match.get('score_breakdown',{}).get('blue',{}).get('totalPoints',0) - match.get('score_breakdown',{}).get('blue',{}).get('foulPoints',0), prediction.get('blue_score'))
         return prediction
 
          
