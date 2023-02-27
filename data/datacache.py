@@ -48,8 +48,9 @@ def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=t
             if index_record is not None:
                 if key not in index_record['data']['keys']:
                     index_record['data']['keys'].append(key)
-                else:
-                    index_record['data']['keys'] = [key]
+                # else:
+                #     index_record['data']['keys'] = [key]
+                # print(sub_key, len(index_record.get('data',{}).get('keys',{}))) # Don't remove solves timing issues
                 cache_json(sub_key, index_record, index = False)
             else:
                 print("Creating new Index: ", sub_key)
