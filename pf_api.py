@@ -56,7 +56,6 @@ def read_item(year:int, event:str, team:str, include_metadata: bool = False, inc
     if predictions is None:
         raise HTTPException(status_code=404, detail="Could not find any predictions.")
     
-    print(predictions)
     results = []
     for match in matches:
         for prediction in predictions['data']:
@@ -64,11 +63,8 @@ def read_item(year:int, event:str, team:str, include_metadata: bool = False, inc
                 results.append(prediction)
     return {'data': results}
         
-
-    print("First Entry: " ,response)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
-    print(response)
     return response
 
 @app.get("/{year}/{event}/stats")
@@ -76,7 +72,6 @@ def read_item(year:int, event:str, include_metadata:bool = False, include_interm
     response = source.get_year_event_team_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
-    print(response)
     return response
 
 @app.get("/{year}/{event}/predictions")
@@ -84,7 +79,6 @@ def read_item(year:int, event:str, include_metadata:bool = False, include_interm
     response = source.get_match_prediction_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
-    print(response)
     return response
 
 

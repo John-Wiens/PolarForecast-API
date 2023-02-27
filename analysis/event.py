@@ -30,10 +30,15 @@ class Event():
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
         self.tba_matches = get_year_event_matches_tba(self.year, self.event_key)
+        print(f"    Retrieved {len(self.tba_matches)} Matches.")
         self.tba_teams = get_year_event_teams_tba(self.year, self.event_key)
+        print(f"    Retrieved {len(self.tba_teams)} Teams.")
         self.tba_rankings = get_year_event_rankings_tba(self.year, self.event_key)
+        print(f"    Retrieved Rankings.")
         self.teams = self.update_team_info()
+        print(f"    Updated {len(self.teams)} Teams.")
         self.update_match_predictions()
+        print(f"    Updated Match Predictions.")
         # self.ml()
 
     def ml(self):
