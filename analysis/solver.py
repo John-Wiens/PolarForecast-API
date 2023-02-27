@@ -37,8 +37,8 @@ def parse_solution(solution, teams, stats):
 
 def linked_solve(matches, teams, stats):
     for stat in stats:
+        list_name = "_"+stat.stat_key+"_list"
         for match in matches:
-            list_name = "_"+stat.stat_key+"_list"
             for i in range(0, 3):
                 blue_key = match['alliances']['blue']['team_keys'][i]
                 red_key = match['alliances']['red']['team_keys'][i]
@@ -56,7 +56,7 @@ def linked_solve(matches, teams, stats):
                     teams[red_key][list_name] = [red_value]
 
         for team in teams.values():
-            if len(team[list_name]) > 0:
+            if len(team.get(list_name,[])) > 0:
                 team[stat.stat_key] = sum(team[list_name]) / len(team[list_name])
             else:
                 team[stat.stat_key] = 0
@@ -94,5 +94,7 @@ def build_score_matrix(matches, teams, stats):
             team_array[num_matches+i][red_index] = 1
             
         i+=1
+
+    
 
     return team_array, score_array

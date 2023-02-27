@@ -84,6 +84,19 @@ def store_year_event_matches_tba(year:int, event:str, data:dict) -> bool:
     key = matches_request_base.format(year=year, event=event)
     return store(key, data, index = False)
 
+def get_year_event_team_matches(year: int, event:str, team:str) -> list:
+    matches = get_year_event_matches_tba(year, event)
+
+    output = []
+    for match in matches:
+        print(match.get('alliances',{}).get('blue',{}).get('team_keys',[]))
+        print(team)
+        if team in match.get('alliances',{}).get('blue',{}).get('team_keys',[]) or team in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
+            output.append(match)
+            print(match)
+
+    return output
+
 
 # Blue Alliance Team Data
 def get_year_event_teams_tba(year:int, event:str) -> dict:

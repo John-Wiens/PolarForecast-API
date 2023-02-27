@@ -1,8 +1,9 @@
 from config import FRC_GAMES
-from data.data import get, store
+from data.data import get, store, get_year_event_list_tba
 from analysis.event import Event
 from games.frc_game import FRCGame
-
+from datetime import datetime, timedelta
+import traceback
 
 
 
@@ -27,11 +28,31 @@ def update_event(year, event_key):
         event = Event(year, event_key, game)
         event.update()
 
+def get_as_date(date)   :
+    return datetime.strptime(date, '%Y-%m-%d')
 
 # Function called by the polling API to perform generic updates on all of the events. 
 def update():
     print("Updating Events")
-    update_event(2022, "code")
+    # update_event(2023, "week0")
+    today = datetime.now()
+    events = get_year_event_list_tba(2023)
+    for event in events:
+        try:
+            start = get_as_date(event['start_date']) - timedelta(days = 1)
+            end = get_as_date(event['end_date']) + timedelta(days = 1)
+            #if event['event_code'] in ["hop", "new", "gal", "carv", "roe", "tur"]:
+            # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
+            #if today >= start:
+            if today >= start and today <= end:
+                update_event(event.get('year',2023), event.get('event_code'))
+                
+            
+
+        except Exception as e:
+            print("Error:", e)
+            traceback.print_exc()
+
     pass
 
 
