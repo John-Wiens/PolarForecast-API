@@ -59,9 +59,6 @@ class Event():
                 blue_score = match['score_breakdown']['blue']['totalPoints']
                 red_score = match['score_breakdown']['red']['totalPoints']
                 ml.write(f'{blue_score},{red_score}\n')
-                print(match['key'], blue_score, red_score, endgame)
-        
-        print(count)
 
     # Update Team Performances Based on Latest available TBA Data
     def update_team_info(self):
@@ -88,7 +85,6 @@ class Event():
                 teams = sum_solve(teams, stat)
                 pass
             elif stat.solve_strategy == CUSTOM_SOLVER:
-                print("Custom Solve")
                 teams = stat.solve_function(played_matches, teams, stat, self.tba_rankings)
                 pass
             else:
@@ -129,7 +125,8 @@ class Event():
     def get_played_matches(self, matches):
         played_matches = []
         for match in matches:
-            if "post_result_time" in match and match["post_result_time"] > 0: #and match['comp_level'] == 'qm'
+            result_time = match.get("post_result_time",-1)
+            if result_time is not None and result_time > 0: #and match['comp_level'] == 'qm'
                 played_matches.append(match)
         return played_matches
 

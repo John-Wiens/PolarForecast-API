@@ -256,8 +256,6 @@ class ChargedUp2023(FRCGame):
             low_links = int(float(stats.get('teleopLow') + stats.get('autoLow'))/3.0)
 
             stats['links'] = high_links + mid_links + low_links
-
-        print(teams['frc3467'])
         return teams
         
 
@@ -328,6 +326,15 @@ class ChargedUp2023(FRCGame):
 
 
         prediction[f"{color}_score"] = round(score,2)
+        prediction[f"{color}_highCubes"] = round(high_cubes,2)
+        prediction[f"{color}_highCubes"] = round(high_cones,2)
+        prediction[f"{color}_midCubes"] = round(mid_cubes,2)
+        prediction[f"{color}_midCones"] = round(mid_cones,2)
+        prediction[f"{color}_low"] = round(low,2)
+        prediction[f"{color}_links"] = round(links,2)
+        prediction[f"{color}_autoChargeStation"] = round(auto_charge_station,2)
+        prediction[f"{color}_endGame"] = round(endgame,2)
+        prediction[f"{color}_autoElements"] = round(auto_elements,2)
 
         
 
