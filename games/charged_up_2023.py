@@ -165,7 +165,7 @@ class ChargedUp2023(FRCGame):
             ]),
 
             CustomStat('links', self.calc_links),
-            SumStat('linkPoints',['links'], weights = [5], report_stat = True),
+            SumStat('linkPoints',['links'],display_name="Links", weights = [5], report_stat = True),
 
             SumStat('autoPoints',[
                 'autoHighCubes',
@@ -251,9 +251,9 @@ class ChargedUp2023(FRCGame):
         for team in teams:
             stats = teams[team]
             
-            high_links = int(float(min(stats.get('teleopHighCubes',0) + stats.get('autoHighCubes'), (stats.get('teleopHighCones',0) + stats.get('autoHighCubes'))/2.0)))
-            mid_links = int(float(min(stats.get('teleopMidCubes',0) + stats.get('autoMidCubes'), (stats.get('teleopMidCones',0) + stats.get('autoMidCubes'))/2.0)))
-            low_links = int(float(stats.get('teleopLow') + stats.get('autoLow'))/3.0)
+            high_links = float(min(stats.get('teleopHighCubes',0) + stats.get('autoHighCubes'), (stats.get('teleopHighCones',0) + stats.get('autoHighCubes'))/2.0))
+            mid_links = float(min(stats.get('teleopMidCubes',0) + stats.get('autoMidCubes'), (stats.get('teleopMidCones',0) + stats.get('autoMidCubes'))/2.0))
+            low_links = float(stats.get('teleopLow') + stats.get('autoLow'))/3.0
 
             stats['links'] = high_links + mid_links + low_links
         return teams
