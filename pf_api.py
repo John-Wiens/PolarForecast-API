@@ -77,8 +77,8 @@ def read_item(year:int, event:str, match_key:str, include_metadata: bool = False
     if match is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied Match in the database.")
     
-    prediction = source.get_match_prediction(year, event, match)
-
+    prediction = source.get_match_prediction(year, event, match_key)
+    print(prediction)
     response = {
         'match': match,
         'prediction': prediction,
