@@ -22,11 +22,14 @@ def lookup_game(year: int, event_key:str) -> FRCGame:
 
 
 
-def update_event(year, event_key):
+def update_event(tba_event):
+    year = tba_event.get('year',2023)
+    event_key = tba_event.get('event_code')
     game = lookup_game(year, event_key)
     if game is not None:
-        event = Event(year, event_key, game)
+        event = Event(tba_event, game)
         event.update()
+
 
 def get_as_date(date)   :
     return datetime.strptime(date, '%Y-%m-%d')
@@ -45,7 +48,7 @@ def update():
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             if today >= start and today <= end:
-                update_event(event.get('year',2023), event.get('event_code'))
+                update_event(event)
                 
             
 

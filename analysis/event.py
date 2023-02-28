@@ -11,9 +11,11 @@ class Event():
     event_key: str
     game: FRCGame
 
-    def __init__(self, year:int, event_key:str, game:FRCGame):
-        self.year = year
-        self.event_key = event_key
+    def __init__(self, tba_event:dict, game:FRCGame):
+        print(tba_event)
+        self.tba_event = tba_event
+        self.year = tba_event.get('year',0)
+        self.event_key = tba_event.get('event_code','')
         self.game = game()
         self.tba_matches = None
         self.data_integrity_check = "unknown"
@@ -21,7 +23,7 @@ class Event():
         
         
         
-        add_search_key(f"{self.year}{self.event_key}", self.page)
+        add_search_key(f"{self.year}{self.event_key}",f"{self.year} {tba_event.get('name','')} [{self.event_key}]", self.page)
 
     def create_search_keys(self):
         self.tba_event_info = get_year_event_matches_tba(self.year, self.event_key)

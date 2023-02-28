@@ -158,8 +158,8 @@ def get_match_prediction_index(year:int, event:str, remove_metadata = True, remo
 
 
 # Update Search Keys
-def add_search_key(search_key:str, page: str) -> bool:
-    store_search_key(search_key, {"key": search_key, "page": page})
+def add_search_key(search_key:str, display:str, page: str) -> bool:
+    store_search_key(search_key, {"key": search_key, "display":display, "page": page})
 
 def get_search_key(search_key:str) -> dict:
     key = search_keys_base.format(key = search_key)
