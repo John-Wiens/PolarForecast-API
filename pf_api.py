@@ -67,6 +67,32 @@ def read_item(year:int, event:str, team:str, include_metadata: bool = False, inc
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
     return response
 
+@app.get("/{year}/{event}/{match_key}/match_details")
+def read_item(year:int, event:str, match_key:str, include_metadata: bool = False, include_intermediate:bool = False):
+    matches = source.get_year_event_matches_tba(year, event)
+    match = None
+    for m in matches:
+        if m.get('key','') == match_key:
+            match = m
+    if match is None:
+        raise HTTPException(status_code=404, detail="Could not find the supplied Match in the database.")
+    
+    prediction = source.get_match_prediction(year, event, match)
+
+    response = {
+        'match': match,
+        'prediction': prediction,
+        'red_teams':[],
+        'blue_teams':[]
+    }
+
+    for color in ['red', 'blue']:
+        for team in match.get('alliances',{}).get(color,{}).get('team_keys',[]):
+            team_stats = source.get_year_event_team(year, event, team)
+            response[f'{color}_teams'].append(team_stats)
+
+    return response
+
 @app.get("/{year}/{event}/stats")
 def read_item(year:int, event:str, include_metadata:bool = False, include_intermediate:bool = False ):
     response = source.get_year_event_team_index(year, event, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
@@ -82,7 +108,6 @@ def read_item(year:int, event:str, include_metadata:bool = False, include_interm
     return response
 
 
-
 @app.get("/{year}/{event}/stat_description")
 def read_item(year:int, event:str):
     game_model = lookup_game(year, event)
@@ -95,7 +120,6 @@ def read_item(year:int, event:str):
         data.append(stat.get_stat_description())
     print(data)
     return {"data": data}
-
 
 @app.get("/events/{year}")
 def read_item(year:int):
