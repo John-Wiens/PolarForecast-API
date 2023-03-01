@@ -1,7 +1,6 @@
 import requests
 import json
 import config
-
 #
 # This file contains helper functions that make it easier to manage blue alliance function calls. 
 # All calls to information in the blue alliance should use the support methods located here. 
@@ -27,16 +26,14 @@ def get(endpoint:str, etag:str="") -> tuple:
         else:
             header = {'X-TBA-Auth-Key':AUTH_KEY}
         response = requests.get(API_URL+endpoint, headers=header)
-
         if response.status_code == 200:
-            return {'data': response.json()}, response.headers['ETag']
+            return {'data': response.json()}, response.headers.get('ETag','')
         elif response.status_code == 304:
-            return None, response.headers['ETag']
+            return None, response.headers.get('ETag','')
         else:
             print("The Blue Alliance API responded with Unexpected Error Code:", response.status_code, response.text, "for endpoint: ", endpoint)
     except Exception as e:
         print("An Unknown Exception has occured when pulling data from TBA", e)
-
 
 
 if __name__ == '__main__':
