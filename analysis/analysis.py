@@ -48,6 +48,7 @@ def update():
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             if today >= start and today <= end:
+            # if event['event_code'] =='isde1':
                 update_event(event)
                 
             
