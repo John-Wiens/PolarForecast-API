@@ -25,17 +25,18 @@ search_key_lookup: str = "/keys"
 # Gets the latest data for the supplied key, if the data not available locally try to get it on the blue alliance
 def get(key:str, update:bool = True, from_tba:bool = False) -> dict:
     result = datacache.get_json(key)
+    print(key, update, from_tba, result['metadata'])
     if result is None:
         if from_tba:
             tba_data, etag = tba.get(key)
-            datacache.cache_json(key, tba_data, etag=etag)
+            datacache.cache_json(key, tba_data, etag=etag, tba=from_tba)
             return datacache.get_json(key)
         else:
             return None
-    elif update and result['metadata']['tba']:
-        tba_data, etag = tba.get(key, etag=result['metadata']['etag'])
+    elif update and from_tba:
+        tba_data, etag = tba.get(key, etag=result.get('metadata',{}).get('etag',""))
         if tba_data is not None and etag is not None:
-            datacache.cache_json(key, tba_data, etag=etag)
+            datacache.cache_json(key, tba_data, etag=etag, tba=from_tba)
             return datacache.get_json(key)
         else:
             return result
