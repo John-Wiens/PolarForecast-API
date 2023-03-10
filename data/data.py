@@ -25,7 +25,6 @@ search_key_lookup: str = "/keys"
 # Gets the latest data for the supplied key, if the data not available locally try to get it on the blue alliance
 def get(key:str, update:bool = True, from_tba:bool = False) -> dict:
     result = datacache.get_json(key)
-    print(key, update, from_tba, result['metadata'])
     if result is None:
         if from_tba:
             tba_data, etag = tba.get(key)
