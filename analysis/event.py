@@ -1,9 +1,9 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
-from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key, store_match_prediction
+from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key, store_match_prediction, team_key_base
 from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
-
-
+from data.datacache import get_data_matching_key
+from datetime import datetime
 
 class Event():
 
@@ -28,6 +28,11 @@ class Event():
     def create_search_keys(self):
         self.tba_event_info = get_year_event_matches_tba(self.year, self.event_key)
 
+    def get_as_date(self, date):
+        if(date != ''):
+            return datetime.strptime(date, '%Y-%m-%d')
+        else:
+            return None
 
     def update(self):
         print(f"Updating Event {self.year}{self.event_key}")
@@ -73,6 +78,10 @@ class Event():
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings)
 
+
+        if len(teams) == 0:
+            return teams
+
         for preprocessor in self.game.preprocessors:
             played_matches, teams = preprocessor(played_matches, teams)
 
@@ -108,11 +117,6 @@ class Event():
 
     def save_team_stats(self, teams, stats):
         for team in teams:
-            # for stat in stats:
-                # if not stat.report_stat:
-                #     del teams[team][stat.stat_key]
-            #key = self.team_key_base.format(year = self.year, event=self.event_key, team=team)
-            #store(key, teams[team], index=True)
             store_year_event_team(self.year, self.event_key, team, teams[team])
 
     def get_sanitized_matches(self, matches):
@@ -145,8 +149,33 @@ class Event():
     def create_team_lookup(self, teams, rankings):
         team_lookup = {}
         index = 0
+        event_day = self.get_as_date(self.tba_event.get('start_date'))
         for team in teams:
-            team_lookup[team['key']] = {'key':team['key'], '_index':index}
+            previous_events = get_data_matching_key(team_key_base.format(year=self.year, event="*", team = team['key']))
+
+            latest_date = datetime(self.year, 1, 1)
+            latest_event = None
+            for event in previous_events:
+                comp_date = self.get_as_date(event.get('_end_date',''))
+                print(team['key'], comp_date)
+                if comp_date != None and comp_date > latest_date and comp_date < event_day:
+                    latest_date = comp_date
+                    latest_event = event
+            print(team['key'], latest_date)
+            if latest_event != None:
+                del latest_event['metadata']
+                team_lookup[team['key']] = latest_event
+                team_lookup[team['key']]['historical'] = True
+
+            else:
+                team_lookup[team['key']] = {'historical': False}
+
+            team_lookup[team['key']]['key'] = team['key']
+            team_lookup[team['key']]['_index'] = index
+            team_lookup[team['key']]['_event'] = self.tba_event.get('event_code')
+            team_lookup[team['key']]['_start_date'] = self.tba_event.get('start_date','')
+            team_lookup[team['key']]['_end_date'] = self.tba_event.get('end_date','')
+
             index +=1
 
         
