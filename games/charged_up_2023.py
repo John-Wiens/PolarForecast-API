@@ -385,6 +385,10 @@ class ChargedUp2023(FRCGame):
         prediction[f"{color}_autoElements"] = round(auto_elements,2)
         prediction[f"{color}_chargeStation"] = round(auto_charge_station) + round(endgame)
 
+        if(match.get('post_result_time',-1)>0):
+            print("Including Real Results")
+            prediction[f"{color}_actual_score"] = match.get('alliances',{}).get(color,{}).get('score',-1)
+
         
 
 
@@ -394,9 +398,13 @@ class ChargedUp2023(FRCGame):
             'comp_level': match.get('comp_level', 'unknown'),
             'key': match.get('key', 'unknown'),
             'match_number': match.get('match_number',0),
+            'set_number': match.get('set_number',0)
         }
+        
+
         self.predict_alliance('blue', match, teams, prediction)
         self.predict_alliance('red', match, teams, prediction)
+        
 
         if prediction['blue_score'] > prediction['red_score']:
             prediction['blue_win_rp'] = 2
