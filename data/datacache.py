@@ -70,6 +70,14 @@ def cache_json(key: str, dictionary:dict, etag:str = None, last_modified:float=t
         print(f"Issue Caused while storing key: {key}, Data: {dictionary}")
         return False
 
+def get_matching_key(search)-> list:
+    return redis.scan_iter(search)
+
+def get_data_matching_key(search)-> list:
+    output = []
+    for key in get_matching_key(search):
+        output.append(get_json(key))
+    return output
 
 def get_keys(index: str)->list:
     return redis.scan_iter(f"{index}/*")

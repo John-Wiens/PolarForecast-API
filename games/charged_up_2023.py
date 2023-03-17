@@ -215,9 +215,9 @@ class ChargedUp2023(FRCGame):
                 'linkPoints'
             ], display_name="OPR", report_stat = True),
 
-            SumStat('simulatedRanking',[]),
-            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
+            # SumStat('simulatedRanking',[]),
+            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            # CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
             
 
             
@@ -269,8 +269,12 @@ class ChargedUp2023(FRCGame):
 
     # Assigns Event Rankings to all the Teams at the event
     def assign_ranks(self, played_matches:list, teams:list, stat:dict, rankings:dict)-> dict:
-        for rank in rankings['rankings']:
-            teams[rank['team_key']]['rank'] = rank['rank']
+        if(rankings != None):
+            for rank in rankings['rankings']:
+                teams[rank['team_key']]['rank'] = rank['rank']
+        else:
+            for team in teams:
+                teams[team]['rank'] = 0
         return teams
 
     def calc_schedule(self, matches:list, teams:list, stat:dict, rankings:dict)-> dict:
@@ -331,16 +335,16 @@ class ChargedUp2023(FRCGame):
         low = 0
         for team_key in match.get('alliances',{}).get(color,{}).get('team_keys',[]):
             team = teams.get(team_key,{})
-            auto_elements += team.get('autoHighCubes') + team.get('autoHighCones') + team.get('autoMidCubes') + team.get('autoMidCones') + team.get('autoLow')
-            high_cubes += team.get('autoHighCubes') + team.get('teleopHighCubes')
-            high_cones += team.get('autoHighCones') + team.get('teleopHighCones')
+            auto_elements += team.get('autoHighCubes',0) + team.get('autoHighCones',0) + team.get('autoMidCubes',0) + team.get('autoMidCones',0) + team.get('autoLow',0)
+            high_cubes += team.get('autoHighCubes',0) + team.get('teleopHighCubes',0)
+            high_cones += team.get('autoHighCones',0) + team.get('teleopHighCones',0)
 
-            mid_cubes += team.get('autoMidCubes') + team.get('teleopMidCubes')
-            mid_cubes += team.get('autoMidCones') + team.get('teleopMidCones')
+            mid_cubes += team.get('autoMidCubes',0) + team.get('teleopMidCubes',0)
+            mid_cubes += team.get('autoMidCones',0) + team.get('teleopMidCones',0)
 
-            low += team.get('autoLow') + team.get('teleopLow')
-            endgame += team.get('endgamePoints')
-            auto_charge_station = max(auto_charge_station, team.get('autoChargeStation'))
+            low += team.get('autoLow',0) + team.get('teleopLow',0)
+            endgame += team.get('endgamePoints',0)
+            auto_charge_station = max(auto_charge_station, team.get('autoChargeStation',0))
 
         
 
@@ -386,14 +390,12 @@ class ChargedUp2023(FRCGame):
         prediction[f"{color}_chargeStation"] = round(auto_charge_station) + round(endgame)
 
         if(match.get('post_result_time',-1)>0):
-            print("Including Real Results")
             prediction[f"{color}_actual_score"] = match.get('alliances',{}).get(color,{}).get('score',-1)
 
         
 
 
     def predict_match(self, match:dict, teams:dict) -> dict:
-        #print("Predicting Match", match)
         prediction = {
             'comp_level': match.get('comp_level', 'unknown'),
             'key': match.get('key', 'unknown'),

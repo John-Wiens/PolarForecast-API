@@ -1,5 +1,5 @@
-from config import FRC_GAMES
-from data.data import get, store, get_year_event_list_tba
+from config import FRC_GAMES, ENABLE_BACKPOP
+from data.data import get, store, get_year_event_list_tba, get_all_search_keys
 from analysis.event import Event
 from games.frc_game import FRCGame
 from datetime import datetime, timedelta
@@ -31,7 +31,7 @@ def update_event(tba_event):
         event.update()
 
 
-def get_as_date(date)   :
+def get_as_date(date):
     return datetime.strptime(date, '%Y-%m-%d')
 
 # Function called by the polling API to perform generic updates on all of the events. 
@@ -40,15 +40,24 @@ def update():
     # update_event(2023, "week0")
     today = datetime.now()
     events = get_year_event_list_tba(2023)
+    events = sorted(events, key=lambda d: get_as_date(d['end_date']))
+    keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     for event in events:
         try:
             start = get_as_date(event['start_date']) - timedelta(days = 1)
             end = get_as_date(event['end_date']) + timedelta(days = 1)
+
+            # Fix Missing Data
+            if ENABLE_BACKPOP and end < today and not event['key'] in keys:
+                print("Updating Missing Data", event['key'])
+                update_event(event)
+
+
             #if event['event_code'] in ["hop", "new", "gal", "carv", "roe", "tur"]:
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             if today >= start and today <= end:
-            # if event['event_code'] =='isde2':
+            # if event['event_code'] =='code':
                 update_event(event)
                 
             

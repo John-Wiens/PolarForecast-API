@@ -10,7 +10,10 @@ event_list_request_base:str = "/events/{year}/simple"
 
 # Generated Data Locations
 team_key_base: str = "/year/{year}/event/{event}/teams/{team}"
+team_event_base: str = "/year/{year}/team/{team}/events"
 match_prediction_base: str = "/year/{year}/event/{event}/matches/{match}"
+global_team_base = "/year/{year}/global/{team}"
+
 
 search_keys_base: str = "/keys/{key}"
 search_key_lookup: str = "/keys"
@@ -153,7 +156,20 @@ def store_match_prediction(year:int, event:str, match:str, data:dict) -> bool:
 
 def get_match_prediction_index(year:int, event:str, remove_metadata = True, remove_intermediate = True) -> dict:
     key = datacache.get_index_key(match_prediction_base.format(year=year, event=event, match=""))
-    
+    return get_from_index(key, remove_metadata = remove_metadata, remove_intermediate = remove_intermediate)
+
+
+# Team Global Performance Data
+def get_year_global_team(year:int, team:str) -> dict:
+    key = global_team_base.format(year=year, team = team)
+    return get(key)
+
+def store_year_global_team(year:int, team:str, data:dict) -> bool:
+    key = global_team_base.format(year=year, team = team)
+    return store(key, data, index = True)
+
+def get_year_global_index(year:int, remove_metadata = True, remove_intermediate = True) -> dict:
+    key = datacache.get_index_key(match_prediction_base.format(year=year, team=""))
     return get_from_index(key, remove_metadata = remove_metadata, remove_intermediate = remove_intermediate)
 
 
