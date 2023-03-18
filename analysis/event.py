@@ -150,18 +150,20 @@ class Event():
         team_lookup = {}
         index = 0
         event_day = self.get_as_date(self.tba_event.get('start_date'))
+        load_historical = not (self.get_as_date(self.tba_event.get('end_date')) < datetime.now())
         for team in teams:
-            previous_events = get_data_matching_key(team_key_base.format(year=self.year, event="*", team = team['key']))
-
+            if load_historical:
+                previous_events = get_data_matching_key(team_key_base.format(year=self.year, event="*", team = team['key']))
+            else:
+                previous_events = []
+            
             latest_date = datetime(self.year, 1, 1)
             latest_event = None
             for event in previous_events:
                 comp_date = self.get_as_date(event.get('_end_date',''))
-                print(team['key'], comp_date)
                 if comp_date != None and comp_date > latest_date and comp_date < event_day:
                     latest_date = comp_date
                     latest_event = event
-            print(team['key'], latest_date)
             if latest_event != None:
                 del latest_event['metadata']
                 team_lookup[team['key']] = latest_event

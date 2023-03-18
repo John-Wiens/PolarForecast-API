@@ -215,9 +215,9 @@ class ChargedUp2023(FRCGame):
                 'linkPoints'
             ], display_name="OPR", report_stat = True),
 
-            # SumStat('simulatedRanking',[]),
-            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            # CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
+            SumStat('simulatedRanking',[]),
+            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
             
 
             
@@ -389,7 +389,8 @@ class ChargedUp2023(FRCGame):
         prediction[f"{color}_autoElements"] = round(auto_elements,2)
         prediction[f"{color}_chargeStation"] = round(auto_charge_station) + round(endgame)
 
-        if(match.get('post_result_time',-1)>0):
+        result_time = match.get('post_result_time',-1)
+        if result_time != None and result_time > 0 :
             prediction[f"{color}_actual_score"] = match.get('alliances',{}).get(color,{}).get('score',-1)
 
         
