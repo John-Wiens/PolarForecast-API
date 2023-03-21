@@ -12,6 +12,9 @@ class ChargedUp2023(FRCGame):
 
         self.stats = [
             CustomStat('rank', self.assign_ranks, report_stat=True),
+            SumStat('opr',[], display_name='OPR', report_stat = True),
+            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            SumStat('schedule',[], display_name='Schedule', report_stat = True),
 
             # Declare all Source Stats
             Stat('_autoCommunity_T_0'),
@@ -216,7 +219,7 @@ class ChargedUp2023(FRCGame):
             ], display_name="OPR", report_stat = True),
 
             SumStat('simulatedRanking',[]),
-            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
             CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
             
 
