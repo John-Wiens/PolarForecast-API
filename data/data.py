@@ -17,7 +17,7 @@ global_team_base = "/year/{year}/global/{team}"
 
 search_keys_base: str = "/keys/{key}"
 search_key_lookup: str = "/keys"
-search_key_cache: str = "/keys/cache"
+search_key_cache: str = "/keys_cache"
 
 
 
@@ -174,8 +174,8 @@ def get_year_global_index(year:int, remove_metadata = True, remove_intermediate 
 
 
 # Update Search Keys
-def add_search_key(search_key:str, display:str, page: str) -> bool:
-    store_search_key(search_key, {"key": search_key, "display":display, "page": page})
+def add_search_key(search_key:str, display:str, page: str, start_day:str, end_day:str) -> bool:
+    store_search_key(search_key, {"key": search_key, "display":display, "page": page, "start": start_day, "end": end_day})
 
 def get_search_key(search_key:str) -> dict:
     key = search_keys_base.format(key = search_key)
@@ -193,7 +193,7 @@ def update_search_key_cache()-> dict:
     return store(search_key_cache, data)
 
 def get_search_key_from_cache() -> dict:
-    return datacache.get_data_with_key(search_key_cache)
+    return get(search_key_cache)
     
 
 
