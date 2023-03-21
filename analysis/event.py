@@ -23,7 +23,7 @@ class Event():
         
         
         
-        add_search_key(f"{self.year}{self.event_key}",f"{self.year} {tba_event.get('name','')} [{self.event_key}]", self.page)
+        add_search_key(f"{self.year}{self.event_key}",f"{self.year} {tba_event.get('name','')} [{self.event_key}]", self.page, tba_event.get('start_date',None), tba_event.get('end_date', None))
 
     def create_search_keys(self):
         self.tba_event_info = get_year_event_matches_tba(self.year, self.event_key)

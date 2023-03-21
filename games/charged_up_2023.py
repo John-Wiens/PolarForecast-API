@@ -216,7 +216,7 @@ class ChargedUp2023(FRCGame):
             ], display_name="OPR", report_stat = True),
 
             SumStat('simulatedRanking',[]),
-            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
             CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
             
 
