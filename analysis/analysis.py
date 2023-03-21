@@ -1,5 +1,5 @@
 from config import FRC_GAMES, ENABLE_BACKPOP
-from data.data import get, store, get_year_event_list_tba, get_all_search_keys
+from data.data import get, store, get_year_event_list_tba, get_all_search_keys, update_search_key_cache
 from analysis.event import Event
 from games.frc_game import FRCGame
 from datetime import datetime, timedelta
@@ -57,7 +57,7 @@ def update():
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             if today >= start and today <= end:
-            # if event['event_code'] =='code':
+            # if event['event_code'] =='utwv':
                 update_event(event)
                 
             
@@ -65,7 +65,7 @@ def update():
         except Exception as e:
             print("Error:", e)
             traceback.print_exc()
-
+    update_search_key_cache()
     pass
 
 

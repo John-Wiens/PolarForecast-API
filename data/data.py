@@ -17,7 +17,7 @@ global_team_base = "/year/{year}/global/{team}"
 
 search_keys_base: str = "/keys/{key}"
 search_key_lookup: str = "/keys"
-
+search_key_cache: str = "/keys/cache"
 
 
 
@@ -187,6 +187,13 @@ def store_search_key(search_key:str, data:dict) -> bool:
 
 def get_all_search_keys() -> dict:
     return datacache.get_data_with_key(search_key_lookup)
+
+def update_search_key_cache()-> dict:
+    data = get_all_search_keys()
+    return store(search_key_cache, data)
+
+def get_search_key_from_cache() -> dict:
+    return datacache.get_data_with_key(search_key_cache)
     
 
 
