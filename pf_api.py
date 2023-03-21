@@ -130,7 +130,7 @@ def read_item(year:int):
 
 @app.get("/search_keys")
 def read_item():
-    response = source.get_all_search_keys()
+    response = source.get_search_key_from_cache()
     if response is None:
         raise HTTPException(status_code=404, detail="Could not find the desired key in the database")
     return response
