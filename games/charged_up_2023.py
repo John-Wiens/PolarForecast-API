@@ -285,6 +285,18 @@ class ChargedUp2023(FRCGame):
 
         # for match in matches:
         #     for color in ['red','blue']:
+        print(len(matches))
+        if len(matches) == 0:
+            opr_teams = sorted(teams.items(), key=lambda x:x[1]['OPR'], reverse = True)
+            count = 1
+            for team in opr_teams:
+                teams[team[0]]['expectedRanking'] = count
+                teams[team[0]]['simulatedRanking'] = count
+                teams[team[0]]['schedule'] = 0
+                teams[team[0]]['rank'] = 0
+                count += 1
+            return teams
+
         ranks = {}
         for team in teams:
             ranks[team] = []
