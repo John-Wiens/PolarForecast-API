@@ -1,7 +1,7 @@
 from config import MATCH_SANITIZATION
 from games.frc_game import FRCGame
 from data.data import get, store, get_year_event_matches_tba, get_year_event_teams_tba, get_year_event_rankings_tba, store_year_event_team, add_search_key, store_match_prediction, team_key_base
-from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
+from analysis.solver import smart_solve, linked_solve, sum_solve, SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER, POST_SOLVER
 from data.datacache import get_data_matching_key
 from datetime import datetime
 
@@ -102,6 +102,9 @@ class Event():
                 pass
             elif stat.solve_strategy == CUSTOM_SOLVER:
                 teams = stat.solve_function(played_matches, teams, stat, self.tba_rankings)
+                pass
+            elif stat.solve_strategy == POST_SOLVER:
+                teams = stat.solve_function(matches, teams, stat, self.tba_rankings)
                 pass
             else:
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )

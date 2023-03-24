@@ -1,6 +1,6 @@
 
 
-from analysis.solver import SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER
+from analysis.solver import SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLVER, POST_SOLVER
 
 
 # Class to Encapsulate the possible ways that a given metric can be solved for. 
@@ -62,6 +62,14 @@ class SumStat(Stat):
 class CustomStat(Stat):
     def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False):
         super().__init__(stat_key, solve_strategy=CUSTOM_SOLVER, display_name = display_name, report_stat = report_stat)
+        self.solve_function = solve_function
+
+    def solve_function(matches, teams):
+        pass
+
+class PostStat(Stat):
+    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False):
+        super().__init__(stat_key, solve_strategy=POST_SOLVER, display_name = display_name, report_stat = report_stat)
         self.solve_function = solve_function
 
     def solve_function(matches, teams):
