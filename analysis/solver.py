@@ -6,6 +6,7 @@ SMART_SOLVER = 'smart_solve'
 LINKED_SOLVER = 'linked'
 SUM_SOLVER = 'sum'
 CUSTOM_SOLVER = 'custom'
+POST_SOLVER = 'post'
 
 def smart_solve(matches, teams, stats):
     team_array, score_array = build_score_matrix(matches, teams, stats)
