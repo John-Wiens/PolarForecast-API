@@ -1,5 +1,5 @@
 from games.frc_game import FRCGame
-from analysis.stat import Stat, LinkedStat, SumStat, CustomStat
+from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
 from analysis.simulator import get_random_schedule, simulate_event
 
 
@@ -217,7 +217,7 @@ class ChargedUp2023(FRCGame):
 
             SumStat('simulatedRanking',[]),
             SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            CustomStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
+            PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
             
 
             
@@ -285,7 +285,7 @@ class ChargedUp2023(FRCGame):
 
         # for match in matches:
         #     for color in ['red','blue']:
-        print(len(matches))
+        print("Matches" ,len(matches))
         if len(matches) == 0:
             opr_teams = sorted(teams.items(), key=lambda x:x[1]['OPR'], reverse = True)
             count = 1
@@ -310,7 +310,7 @@ class ChargedUp2023(FRCGame):
             for team in rankings:
                 ranks[team[0]].append(rank)
                 rank +=1
-        
+
         ranks = sorted(ranks.items(), key=lambda x:sum(x[1]))
         count = 1
         for rank in ranks:
@@ -326,7 +326,6 @@ class ChargedUp2023(FRCGame):
             teams[rank[0]]['expectedRanking'] = count
             teams[rank[0]]['schedule'] = teams[rank[0]]['simulatedRanking'] - count
             count +=1
-
         return teams
 
     def validate_match(self, match:dict) -> bool:
