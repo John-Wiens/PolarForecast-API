@@ -342,7 +342,7 @@ class ChargedUp2023(FRCGame):
             # lb = np.searchsorted(rp_distribution, expected_rp)
             percentile = (np.searchsorted(rp_distribution, expected_rp[rank[0]], side="left")) / num_sims * 100
 
-            print(rank[0], percentile)
+            # print(rank[0], percentile)
             teams[rank[0]]['schedule'] = percentile
             avg_percentile += percentile
             count +=1

@@ -156,8 +156,10 @@ force_update = True
 @repeat_every(seconds=TBA_POLLING_INTERVAL)
 def update_database():
     if TBA_POLLING:
-        update(force_update=force_update)
+        global force_update
         force_update = False
+        update(force_update=force_update)
+        
 
 
 @app.on_event("startup")
