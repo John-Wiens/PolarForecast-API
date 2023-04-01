@@ -13,7 +13,7 @@ REDIS_STRICT = os.environ.get("PF_REDIS_STRICT", False)
 TBA_API_KEY = os.environ.get("PF_TBA_API_KEY", "")
 
 ENABLE_BACKPOP = os.environ.get("PF_ENABLE_BACKPOP", True)
-
+FORCE_BACKPOP_ONCE = os.environ.get("PF_FORCE_BACKPOP", True)
 
 if TBA_API_KEY == "":
     print("No API KEY for Blue alliance specified.")

@@ -1,7 +1,7 @@
 import analysis.analysis
 import data.data as source
 
-from config import TBA_POLLING, TBA_POLLING_INTERVAL
+from config import TBA_POLLING, TBA_POLLING_INTERVAL, FORCE_BACKPOP_ONCE
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -152,7 +152,8 @@ def read_item():
 #     return response
 @app.on_event("startup")
 def update_once():
-    update(force_update=True)
+    if FORCE_BACKPOP_ONCE:
+        update(force_update=True)
 
 
 @app.on_event("startup")
