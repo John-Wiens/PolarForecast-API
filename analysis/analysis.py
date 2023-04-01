@@ -1,5 +1,5 @@
 from config import FRC_GAMES, ENABLE_BACKPOP
-from data.data import get, store, get_year_event_list_tba, get_all_search_keys, update_search_key_cache
+from data.data import get, store, get_year_event_list_tba, get_all_search_keys, update_search_key_cache, get_year_event_team_index, store_year_team_ranks
 from analysis.event import Event
 from games.frc_game import FRCGame
 from datetime import datetime, timedelta
@@ -68,7 +68,39 @@ def update(force_update = False):
     update_search_key_cache()
     pass
 
+def update_global():
+    today = datetime.now()
+    events = get_year_event_list_tba(2023)
+    events = sorted(events, key=lambda d: get_as_date(d['end_date']), reverse = False)
+    keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
+    teams = {}
+    for event in events:
+        if get_as_date(event.get('end_date')) <  today:
+            new_teams = get_year_event_team_index(2023, event.get('event_code'))
+            
+                
+            if new_teams is not None:
+                team_list = new_teams.get('data')
+                for team in team_list:
+                    teams[team.get('key')] = team
+    teams = sorted(teams.items(), key=lambda x: x[1].get('OPR',0), reverse = True)
 
+    teams = teams[0:100]
+    team_list = []
+    for i, team in enumerate(teams):
+        team[1]['global_ranking'] = i+1
+        team[1].pop('rank',None)
+        team[1].pop('historical',None)
+        team[1].pop('simulatedRanking',None)
+        team[1].pop('expectedRanking',None)
+        team[1].pop('schedule',None)
+        team_list.append(team[1])
+        # print(i+1, team[0], round(team[1].get('OPR',0),2)) 
+
+        # if i > 100:
+        #     break
+    ranks = {'data': team_list}
+    store_year_team_ranks(2023, ranks)
 
 if __name__ == '__main__':
     pass

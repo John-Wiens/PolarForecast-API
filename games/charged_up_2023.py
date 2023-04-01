@@ -328,10 +328,16 @@ class ChargedUp2023(FRCGame):
             schedule_adjust += expected_rp[rank[0]] / (sum(rps[rank[0]]) / num_sims)
             count +=1
 
+<<<<<<< HEAD
         
         schedule_adjust = schedule_adjust / (len(ranks))
 
         print(schedule_adjust)
+=======
+        expected_rp = simulate_event(matches, teams, self.predict_match, self.parse_rps)
+        rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
+        
+>>>>>>> dev
         count = 1
         avg_percentile = 0
 
@@ -494,3 +500,9 @@ class ChargedUp2023(FRCGame):
             red_rp +=1
 
         return (blue_rp,red_rp)
+
+    def validate_match(self, match:dict) -> bool:
+        passing = True
+        passing = 'frc0' not in match.get('alliances',{}).get('blue',{}).get('team_keys',[]) and passing
+        passing = 'frc0' not in match.get('alliances',{}).get('red',{}).get('team_keys',[]) and passing
+        return passing
