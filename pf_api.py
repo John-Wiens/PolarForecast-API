@@ -143,11 +143,13 @@ def read_item():
 #     response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = False)
 #     return response
 
+force_update = True
 @app.on_event("startup")
 @repeat_every(seconds=TBA_POLLING_INTERVAL)
 def update_database():
     if TBA_POLLING:
-        update()
+        update(force_update=force_update)
+        force_update = False
 
 
 
