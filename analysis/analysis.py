@@ -35,7 +35,7 @@ def get_as_date(date):
     return datetime.strptime(date, '%Y-%m-%d')
 
 # Function called by the polling API to perform generic updates on all of the events. 
-def update():
+def update(force_update = False):
     print("Updating Events")
     # update_event(2023, "week0")
     today = datetime.now()
@@ -48,7 +48,7 @@ def update():
             end = get_as_date(event['end_date']) + timedelta(days = 1)
 
             # Fix Missing Data
-            if ENABLE_BACKPOP and end < today and not event['key'] in keys:
+            if force_update or ENABLE_BACKPOP and end < today and not event['key'] in keys:
                 print("Updating Missing Data", event['key'])
                 update_event(event)
 
