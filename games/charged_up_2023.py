@@ -328,16 +328,10 @@ class ChargedUp2023(FRCGame):
             schedule_adjust += expected_rp[rank[0]] / (sum(rps[rank[0]]) / num_sims)
             count +=1
 
-<<<<<<< HEAD
         
         schedule_adjust = schedule_adjust / (len(ranks))
 
         print(schedule_adjust)
-=======
-        expected_rp = simulate_event(matches, teams, self.predict_match, self.parse_rps)
-        rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
-        
->>>>>>> dev
         count = 1
         avg_percentile = 0
 
