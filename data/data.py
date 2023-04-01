@@ -13,6 +13,7 @@ team_key_base: str = "/year/{year}/event/{event}/teams/{team}"
 team_event_base: str = "/year/{year}/team/{team}/events"
 match_prediction_base: str = "/year/{year}/event/{event}/matches/{match}"
 global_team_base = "/year/{year}/global/{team}"
+global_rank_list = "/year/{year}/teams"
 
 
 search_keys_base: str = "/keys/{key}"
@@ -171,6 +172,15 @@ def store_year_global_team(year:int, team:str, data:dict) -> bool:
 def get_year_global_index(year:int, remove_metadata = True, remove_intermediate = True) -> dict:
     key = datacache.get_index_key(match_prediction_base.format(year=year, team=""))
     return get_from_index(key, remove_metadata = remove_metadata, remove_intermediate = remove_intermediate)
+
+# Global Team Rankings
+def get_year_team_ranks(year:int) -> dict:
+    key = global_rank_list.format(year=year)
+    return get(key)
+
+def store_year_team_ranks(year:int, data:dict) -> bool:
+    key = global_rank_list.format(year=year)
+    return store(key, data)
 
 
 # Update Search Keys

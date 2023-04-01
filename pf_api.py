@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
 
-from analysis.analysis import lookup_game, update
+from analysis.analysis import lookup_game, update, update_global
 
 app = FastAPI()
 
@@ -35,6 +35,14 @@ def read_root():
 @app.get("/{year}/{event}/{team}/stats")
 def read_item(year:int, event:str, team: str, include_metadata:bool = False, include_intermediate:bool = False):
     data = source.get_year_event_team(year, event, team)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
+    response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
+    return response
+
+@app.get("/{year}/leaderboard")
+def read_item(year:int, include_metadata:bool = False, include_intermediate:bool = False):
+    data = source.get_year_team_ranks(year)
     if data is None:
         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
     response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = not include_intermediate)
@@ -148,6 +156,14 @@ def read_item():
 def update_database():
     if TBA_POLLING:
         update()
+
+
+@app.on_event("startup")
+@repeat_every(seconds=TBA_POLLING_INTERVAL*6)
+def update_leaderboard():
+    if TBA_POLLING:
+        update_global()
+
 
 
 
