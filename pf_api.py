@@ -150,15 +150,16 @@ def read_item():
 #         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
 #     response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = False)
 #     return response
+@app.on_event("startup")
+def update_once():
+    update(force_update=True)
 
-force_update = True
+
 @app.on_event("startup")
 @repeat_every(seconds=TBA_POLLING_INTERVAL)
 def update_database():
     if TBA_POLLING:
-        global force_update
-        force_update = False
-        update(force_update=force_update)
+        update()
         
 
 
