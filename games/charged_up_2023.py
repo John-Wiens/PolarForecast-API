@@ -1,7 +1,7 @@
 from games.frc_game import FRCGame
 from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
 from analysis.simulator import get_random_schedule, simulate_event
-
+import numpy as np
 
 class ChargedUp2023(FRCGame):
     def __init__(self):
@@ -297,9 +297,11 @@ class ChargedUp2023(FRCGame):
                 count += 1
             return teams
 
+        rps = {}
         ranks = {}
         for team in teams:
             ranks[team] = []
+            rps[team] = []
 
         num_sims = 1000
         for i in range(0,num_sims):
@@ -309,23 +311,40 @@ class ChargedUp2023(FRCGame):
             rank = 1
             for team in rankings:
                 ranks[team[0]].append(rank)
+                rps[team[0]].append(simulated_rps[team[0]])
                 rank +=1
+                
+        expected_rp = simulate_event(matches, teams, self.predict_match, self.parse_rps)
+        rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
 
         ranks = sorted(ranks.items(), key=lambda x:sum(x[1]))
         count = 1
+        schedule_adjust = 0
         for rank in ranks:
             teams[rank[0]]['simulatedRanking'] = count
+            # print(sum(rps[rank[0]]) / num_sims, expected_rp[rank[0]])
+            schedule_adjust += expected_rp[rank[0]] / (sum(rps[rank[0]]) / num_sims)
             count +=1
 
         
-        expected_rp = simulate_event(matches, teams, self.predict_match, self.parse_rps)
-        rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
-        
+        schedule_adjust = schedule_adjust / (len(ranks))
+
+        print(schedule_adjust)
         count = 1
+        avg_percentile = 0
+
         for rank in rankings:
             teams[rank[0]]['expectedRanking'] = count
-            teams[rank[0]]['schedule'] = teams[rank[0]]['simulatedRanking'] - count
+            # teams[rank[0]]['schedule'] = teams[rank[0]]['simulatedRanking'] - count
+            rp_distribution = sorted(rps[rank[0]])
+            # lb = np.searchsorted(rp_distribution, expected_rp)
+            percentile = (np.searchsorted(rp_distribution, expected_rp[rank[0]] / schedule_adjust, side="left")) / num_sims * 100
+
+            print(rank[0], percentile)
+            teams[rank[0]]['schedule'] = percentile
+            avg_percentile += percentile
             count +=1
+        print("Average Percentile", avg_percentile / (len(rankings)))
         return teams
 
     def validate_match(self, match:dict) -> bool:
@@ -450,7 +469,24 @@ class ChargedUp2023(FRCGame):
         else:
             prediction['red_link_rp'] = 0
 
-        # print(match.get('score_breakdown',{}).get('blue',{}).get('totalPoints',0) - match.get('score_breakdown',{}).get('blue',{}).get('foulPoints',0), prediction.get('blue_score'))
+
+        # correct = 0
+        # if match.get('comp_level', 'sf') == 'qm':
+        #     # if(match.get('score_breakdown',{}).get('blue',{}).get('sustainabilityBonusAchieved',0) == (prediction['blue_link_rp'] == 1)):
+        #     #     correct +=1
+
+        #     # if(match.get('score_breakdown',{}).get('red',{}).get('sustainabilityBonusAchieved',0) == (prediction['red_link_rp'] == 1)):
+        #     #     correct +=1
+
+        #     print(match.get('score_breakdown',{}).get('blue',{}).get('activationBonusAchieved',0), prediction['blue_chargeStation'])
+
+        #     if(match.get('score_breakdown',{}).get('blue',{}).get('activationBonusAchieved',0) == (prediction['blue_charge_rp'] == 1)):
+        #         correct +=1
+
+        #     if(match.get('score_breakdown',{}).get('red',{}).get('activationBonusAchieved',0) == (prediction['red_charge_rp'] == 1)):
+        #         correct +=1
+        #     # print(match.get('score_breakdown',{}).get('blue',{}).get('activationBonusAchieved',0), (prediction['blue_charge_rp'] == 1))
+            # print(correct)
         return prediction
     
     def parse_rps(self, match:dict) -> tuple:

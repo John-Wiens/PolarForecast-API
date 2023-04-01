@@ -48,16 +48,16 @@ def update():
             end = get_as_date(event['end_date']) + timedelta(days = 1)
 
             # Fix Missing Data
-            if ENABLE_BACKPOP and end < today and not event['key'] in keys:
-                print("Updating Missing Data", event['key'])
-                update_event(event)
+            # if ENABLE_BACKPOP and end < today and not event['key'] in keys:
+            #     print("Updating Missing Data", event['key'])
+            #     update_event(event)
 
 
             #if event['event_code'] in ["hop", "new", "gal", "carv", "roe", "tur"]:
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
-            if today >= start and today <= end:
-            # if event['event_code'] =='utwv':
+            # if today >= start and today <= end:
+            if event['event_code'] =='code':
                 update_event(event)
                 
             
