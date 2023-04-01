@@ -37,6 +37,17 @@ def get_random_schedule(teams:dict, schedule_length:int):
 
     return matches
 
+def get_clean_schedule(matches:list):
+    new_matches = []
+    for match in matches:
+        if match.get('comp_level','') == 'qm':
+            red_alliance = match.get('alliances',{}).get('red',{}).get('team_keys',[])
+            blue_alliance = match.get('alliances',{}).get('blue',{}).get('team_keys',[])
+            new_matches.append({
+                'alliances':{'red': {'team_keys': red_alliance}, 'blue': {'team_keys': blue_alliance}}
+            })
+    return new_matches
+
 
 def simulate_event(matches:list, teams:dict, prediction_function, rp_function):
     rps = {}
