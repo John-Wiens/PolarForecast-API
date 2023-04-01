@@ -317,7 +317,6 @@ class ChargedUp2023(FRCGame):
             teams[rank[0]]['simulatedRanking'] = count
             count +=1
 
-        
         expected_rp = simulate_event(matches, teams, self.predict_match, self.parse_rps)
         rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
         
@@ -474,3 +473,9 @@ class ChargedUp2023(FRCGame):
             red_rp +=1
 
         return (blue_rp,red_rp)
+
+    def validate_match(self, match:dict) -> bool:
+        passing = True
+        passing = 'frc0' not in match.get('alliances',{}).get('blue',{}).get('team_keys',[]) and passing
+        passing = 'frc0' not in match.get('alliances',{}).get('red',{}).get('team_keys',[]) and passing
+        return passing
