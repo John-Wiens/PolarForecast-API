@@ -48,6 +48,12 @@ def get_clean_schedule(matches:list):
             })
     return new_matches
 
+def get_qual_matches(matches:list):
+    qual_matches = []
+    for match in matches:
+        if match.get('comp_level','') == 'qm':
+            qual_matches.append(match)
+    return qual_matches
 
 def simulate_event(matches:list, teams:dict, prediction_function, rp_function):
     rps = {}

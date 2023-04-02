@@ -1,6 +1,6 @@
 from games.frc_game import FRCGame
 from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
-from analysis.simulator import get_random_schedule, simulate_event, get_clean_schedule
+from analysis.simulator import get_random_schedule, simulate_event, get_clean_schedule, get_qual_matches
 import numpy as np
 
 class ChargedUp2023(FRCGame):
@@ -287,6 +287,7 @@ class ChargedUp2023(FRCGame):
         #     for color in ['red','blue']:
         print("Matches" ,len(matches))
         clean_matches = get_clean_schedule(matches)
+        qual_matches = get_qual_matches(matches)
         if len(clean_matches) == 0:
             opr_teams = sorted(teams.items(), key=lambda x:x[1]['OPR'], reverse = True)
             count = 1
@@ -317,7 +318,8 @@ class ChargedUp2023(FRCGame):
 
 
         expected_rp = simulate_event(clean_matches, teams, self.predict_match, self.parse_rps)
-        rankings = sorted(expected_rp.items(), key=lambda x:x[1], reverse = True)
+        qual_rp = simulate_event(qual_matches, teams, self.predict_match, self.parse_rps)
+        rankings = sorted(qual_rp.items(), key=lambda x:x[1], reverse = True)
 
         ranks = sorted(ranks.items(), key=lambda x:sum(x[1]))
         count = 1
