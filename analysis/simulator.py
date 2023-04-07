@@ -86,13 +86,21 @@ def simulate_event(matches:list, teams:dict, prediction_function, rp_function):
 
             for key in red_keys:
                 red_rp += prediction[key]
-            
+        
+        blue_surrogates = match.get('alliances',{}).get('blue',{}).get('surrogate_team_keys',[])
+        red_surrogates = match.get('alliances',{}).get('red',{}).get('surrogate_team_keys',[])
+
         for team in match.get('alliances',{}).get('blue',{}).get('team_keys',[]):
-            rps[team] += blue_rp
+            if team not in blue_surrogates:
+                rps[team] += blue_rp
+            else:
+                print("Skipping Blue Surrogate", team)
         
         for team in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
-            rps[team] += red_rp
-
+            if team not in red_surrogates:
+                rps[team] += red_rp
+            else:
+                print("Skipping Red Surrogate", team)
 
     return rps
             
