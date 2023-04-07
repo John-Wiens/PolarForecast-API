@@ -463,12 +463,16 @@ class ChargedUp2023(FRCGame):
         else:
             prediction['red_charge_rp'] = 0
 
-        if prediction['blue_links'] > 5:
+        if prediction['blue_links'] >= 5:
+            prediction['blue_link_rp'] = 1
+        elif prediction['red_links'] >= 2 and prediction['blue_links'] >= 4:
             prediction['blue_link_rp'] = 1
         else:
             prediction['blue_link_rp'] = 0
 
-        if prediction['red_links'] > 5:
+        if prediction['red_links'] >= 5:
+            prediction['red_link_rp'] = 1
+        elif prediction['blue_links'] >=2 and prediction['red_links'] >= 4:
             prediction['red_link_rp'] = 1
         else:
             prediction['red_link_rp'] = 0
