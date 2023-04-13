@@ -347,7 +347,9 @@ class ChargedUp2023(FRCGame):
             # print(rank[0], percentile)
             teams[rank[0]]['schedule'] = percentile
             avg_percentile += percentile
+            print(count, rank[0][3:], qual_rp[rank[0]])
             count +=1
+            
         print("Average Percentile", avg_percentile / (len(rankings)))
         return teams
 
@@ -463,16 +465,16 @@ class ChargedUp2023(FRCGame):
         else:
             prediction['red_charge_rp'] = 0
 
-        if prediction['blue_links'] >= 5:
+        if prediction['blue_links'] >= 6:
             prediction['blue_link_rp'] = 1
-        elif prediction['red_links'] >= 2 and prediction['blue_links'] >= 4:
+        elif prediction['red_links'] >= 2 and prediction['blue_links'] >= 5:
             prediction['blue_link_rp'] = 1
         else:
             prediction['blue_link_rp'] = 0
 
-        if prediction['red_links'] >= 5:
+        if prediction['red_links'] >= 6:
             prediction['red_link_rp'] = 1
-        elif prediction['blue_links'] >=2 and prediction['red_links'] >= 4:
+        elif prediction['blue_links'] >=2 and prediction['red_links'] >= 5:
             prediction['red_link_rp'] = 1
         else:
             prediction['red_link_rp'] = 0
@@ -487,6 +489,24 @@ class ChargedUp2023(FRCGame):
         blue_rp += int(match.get('score_breakdown',{}).get('blue',{}).get('sustainabilityBonusAchieved'))
         red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('activationBonusAchieved'))
         red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('sustainabilityBonusAchieved'))
+        # coop_red = match.get('score_breakdown',{}).get('red',{}).get('coopertitionCriteriaMet')
+        # coop_blue = match.get('score_breakdown',{}).get('blue',{}).get('coopertitionCriteriaMet')
+
+        # coop = coop_red and coop_blue
+
+
+        # blue_links = len(match.get('score_breakdown',{}).get('blue',{}).get('links',[]))
+        # red_links = len(match.get('score_breakdown',{}).get('red',{}).get('links',[]))
+
+
+        # if blue_links >=6 or (blue_links >=5 and coop):
+        #     blue_rp +=1
+        
+        # if red_links >=6 or (red_links >=5 and coop):
+        #     red_rp +=1
+
+
+
 
         blue_score = match.get('score_breakdown',{}).get('blue',{}).get('totalPoints',0)
         red_score = match.get('score_breakdown',{}).get('red',{}).get('totalPoints',0)

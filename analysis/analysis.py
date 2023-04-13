@@ -53,11 +53,11 @@ def update(force_update = False):
                 update_event(event)
 
 
-            #if event['event_code'] in ["hop", "new", "gal", "carv", "roe", "tur"]:
+            if event['event_code'] in ["hop", "new", "gal", "carv", "roe", "tur"]:
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
-            if today >= start and today <= end:
-            #if event['event_code'] =='code':
+            # if today >= start and today <= end:
+            # if event['event_code'] =='code':
                 update_event(event)
                 
             
