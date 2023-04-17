@@ -164,6 +164,9 @@ class Event():
             latest_event = None
             for event in previous_events:
                 comp_date = self.get_as_date(event.get('_end_date',''))
+                valid_import = event.get('_valid_import',  True)
+                if not valid_import:
+                    continue
                 if comp_date != None and comp_date > latest_date and comp_date < event_day:
                     latest_date = comp_date
                     latest_event = event
@@ -181,6 +184,10 @@ class Event():
             team_lookup[team['key']]['_start_date'] = self.tba_event.get('start_date','')
             team_lookup[team['key']]['_end_date'] = self.tba_event.get('end_date','')
 
+            if len(self.tba_matches) < 17:
+                team_lookup[team['key']]['_valid_import'] = False
+            else:
+                team_lookup[team['key']]['_valid_import'] = True
             index +=1
 
         

@@ -163,7 +163,15 @@ class ChargedUp2023(FRCGame):
                 '_teleopCommunity_B_7',
                 '_teleopCommunity_B_8',
             ]),
-            SumStat('elementsScored',[
+            SumStat('autoElementsScored',[
+                'autoLow',
+                'autoMidCubes',
+                'autoMidCones',
+                'autoHighCubes',
+                'autoMidCones',
+            ]),
+            
+            SumStat('teleopElementsScored',[
                 'teleopLow',
                 'teleopMidCubes',
                 'teleopMidCones',
@@ -175,6 +183,12 @@ class ChargedUp2023(FRCGame):
                 'autoHighCubes',
                 'autoMidCones',
             ]),
+
+            SumStat('elementsScored',[
+                'teleopElementsScored',
+                'autoElementsScored',
+            ], report_stat = True),
+
             CustomStat('links', self.calc_links),
             SumStat('linkPoints',['links'],display_name="Links", weights = [5], report_stat = True),
 
@@ -369,6 +383,7 @@ class ChargedUp2023(FRCGame):
         mid_cones = 0
 
         low = 0
+        supercharged = 0
         for team_key in match.get('alliances',{}).get(color,{}).get('team_keys',[]):
             team = teams.get(team_key,{})
             auto_elements += team.get('autoHighCubes',0) + team.get('autoHighCones',0) + team.get('autoMidCubes',0) + team.get('autoMidCones',0) + team.get('autoLow',0)
@@ -379,10 +394,14 @@ class ChargedUp2023(FRCGame):
             mid_cubes += team.get('autoMidCones',0) + team.get('teleopMidCones',0)
 
             low += team.get('autoLow',0) + team.get('teleopLow',0)
-            endgame += team.get('endgamePoints',0)
+            
+            # endgame += team.get('endgamePoints',0)
             auto_charge_station = max(auto_charge_station, team.get('autoChargeStation',0))
 
-        
+        if match.get('comp_level') == 'qm':
+            endgame = 22
+        else:
+            endgame = 30
 
 
         if high_cubes > 3:
@@ -402,6 +421,8 @@ class ChargedUp2023(FRCGame):
             mid_cones = 3
 
         if low > 9:
+            if high_cubes >=3 and high_cones >=3 and mid_cubes >=3 and mid_cones >=3:
+                supercharged = low - 9
             low = 9
 
         high_links = int(min(high_cubes, high_cones / 2.0))
@@ -410,7 +431,7 @@ class ChargedUp2023(FRCGame):
 
         links = high_links + mid_links + low_links
 
-        score = links * 5 + (high_cubes + high_cones) * 5 + (mid_cubes + mid_cones) * 3 + low * 2 + auto_elements + auto_charge_station + endgame
+        score = links * 5 + (high_cubes + high_cones) * 5 + (mid_cubes + mid_cones) * 3 + low * 2 + auto_elements + auto_charge_station + endgame + 3 * supercharged
 
         prediction[f"{color}_teams"] = match.get('alliances',{}).get(color,{}).get('team_keys',[])
         prediction[f"{color}_score"] = round(score,2)

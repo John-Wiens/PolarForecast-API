@@ -53,11 +53,13 @@ def update(force_update = False):
                 update_event(event)
 
 
-            if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil"]:
+            if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"]:
+
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             # if today >= start and today <= end:
-            # if event['event_code'] =='code':
+            # if event['event_type'] == 2:
+            # if event['event_code'] =='iscmp':
                 update_event(event)
                 
             
@@ -82,7 +84,8 @@ def update_global():
             if new_teams is not None:
                 team_list = new_teams.get('data')
                 for team in team_list:
-                    teams[team.get('key')] = team
+                    if team.get('_valid_import', True):
+                        teams[team.get('key')] = team
     teams = sorted(teams.items(), key=lambda x: x[1].get('OPR',0), reverse = True)
 
     teams = teams[0:100]
