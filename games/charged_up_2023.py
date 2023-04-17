@@ -187,7 +187,7 @@ class ChargedUp2023(FRCGame):
             SumStat('elementsScored',[
                 'teleopElementsScored',
                 'autoElementsScored',
-            ], report_stat = True),
+            ], report_stat = True, display_name="Elements"),
 
             CustomStat('links', self.calc_links),
             SumStat('linkPoints',['links'],display_name="Links", weights = [5], report_stat = True),
