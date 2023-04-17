@@ -177,11 +177,6 @@ class ChargedUp2023(FRCGame):
                 'teleopMidCones',
                 'teleopHighCubes',
                 'teleopHighCones',
-                'autoLow',
-                'autoMidCubes',
-                'autoMidCones',
-                'autoHighCubes',
-                'autoMidCones',
             ]),
 
             SumStat('elementsScored',[
