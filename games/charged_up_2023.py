@@ -366,6 +366,7 @@ class ChargedUp2023(FRCGame):
         return True
 
     def predict_alliance(self, color:str, match:dict, teams:dict, prediction:dict):
+
         endgame = 0
         auto_charge_station = 0
 
@@ -386,12 +387,18 @@ class ChargedUp2023(FRCGame):
             high_cones += team.get('autoHighCones',0) + team.get('teleopHighCones',0)
 
             mid_cubes += team.get('autoMidCubes',0) + team.get('teleopMidCubes',0)
-            mid_cubes += team.get('autoMidCones',0) + team.get('teleopMidCones',0)
+            mid_cones += team.get('autoMidCones',0) + team.get('teleopMidCones',0)
 
             low += team.get('autoLow',0) + team.get('teleopLow',0)
             
             # endgame += team.get('endgamePoints',0)
             auto_charge_station = max(auto_charge_station, team.get('autoChargeStation',0))
+
+        high_cubes = round(high_cubes)
+        high_cones = round(high_cones)
+        mid_cubes = round(mid_cubes)
+        mid_cones = round(mid_cones)
+        low = round(low)
 
         if match.get('comp_level') == 'qm':
             endgame = 22
@@ -431,11 +438,11 @@ class ChargedUp2023(FRCGame):
         prediction[f"{color}_teams"] = match.get('alliances',{}).get(color,{}).get('team_keys',[])
         prediction[f"{color}_score"] = round(score,2)
         prediction[f"{color}_highCubes"] = round(high_cubes,2)
-        prediction[f"{color}_highCubes"] = round(high_cones,2)
+        prediction[f"{color}_highCones"] = round(high_cones,2)
         prediction[f"{color}_midCubes"] = round(mid_cubes,2)
         prediction[f"{color}_midCones"] = round(mid_cones,2)
-        prediction[f"{color}_low"] = round(low,2)
-        prediction[f"{color}_links"] = round(links,2)
+        prediction[f"{color}_low"] = round(low)
+        prediction[f"{color}_links"] = round(links)
         prediction[f"{color}_autoChargeStation"] = round(auto_charge_station,2)
         prediction[f"{color}_endGame"] = round(endgame,2)
         prediction[f"{color}_autoElements"] = round(auto_elements,2)
@@ -445,10 +452,12 @@ class ChargedUp2023(FRCGame):
         if result_time != None and result_time > 0 :
             prediction[f"{color}_actual_score"] = match.get('alliances',{}).get(color,{}).get('score',-1)
 
-        
+
 
 
     def predict_match(self, match:dict, teams:dict) -> dict:
+
+
         prediction = {
             'comp_level': match.get('comp_level', 'unknown'),
             'key': match.get('key', 'unknown'),
@@ -459,6 +468,8 @@ class ChargedUp2023(FRCGame):
 
         self.predict_alliance('blue', match, teams, prediction)
         self.predict_alliance('red', match, teams, prediction)
+        
+
         
 
         if prediction['blue_score'] > prediction['red_score']:
