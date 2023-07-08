@@ -49,17 +49,17 @@ def update(force_update = False):
 
             # Fix Missing Data
             if force_update or ENABLE_BACKPOP and end < today and not event['key'] in keys:
-                print("Updating Missing Data", event['key'])
-                update_event(event)
+                 print("Updating Missing Data", event['key'])
+                 update_event(event)
 
 
-            if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"]:
+            # if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"]:
 
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
-            #if today >= start:
+            if today >= start:
             # if today >= start and today <= end:
             # if event['event_type'] == 2:
-            # if event['event_code'] =='iscmp':
+            #if event['event_code'] =='joh':
                 update_event(event)
                 
             
