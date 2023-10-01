@@ -314,7 +314,7 @@ class ChargedUp2023(FRCGame):
             ranks[team] = []
             rps[team] = []
 
-        num_sims = 1000
+        num_sims = 50
         for i in range(0,num_sims):
             simulated_schedules = get_random_schedule(teams, len(clean_matches))
             simulated_rps = simulate_event(simulated_schedules, teams, self.predict_match, self.parse_rps)
@@ -356,7 +356,7 @@ class ChargedUp2023(FRCGame):
             # print(rank[0], percentile)
             teams[rank[0]]['schedule'] = percentile
             avg_percentile += percentile
-            print(count, rank[0][3:], qual_rp[rank[0]])
+            print(count, rank[0][3:], qual_rp[rank[0]], percentile, teams[rank[0]])
             count +=1
             
         print("Average Percentile", avg_percentile / (len(rankings)))
