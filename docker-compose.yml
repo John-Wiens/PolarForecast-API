@@ -1,0 +1,32 @@
+# vi docker-compose.yml
+version: '3.8'
+services:
+    mongo:
+        ports:
+            - '27017:27017'
+        container_name: pf-mongo
+        restart: always
+        logging:
+            options:
+                max-size: 1g
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${PF_MONGO_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${PF_MONGO_PASSWORD}
+        image: mongo
+        volumes:
+            - database:/data
+
+    cache:
+        image: redis:6.2-alpine
+        restart: always
+        container_name: pf-redis
+        ports:
+            - '6379:6379'
+        command: redis-server --save 20 1 --loglevel warning --requirepass ${PF_REDIS_PRIMARY_KEY}
+        volumes: 
+            - cache:/data
+volumes:
+    cache:
+        driver: local
+    database:
+        driver: local
