@@ -126,8 +126,9 @@ def read_item(year:int, event:str):
     
     for stat in game.stats:
         data.append(stat.get_stat_description())
+
     print(data)
-    return {"data": data}
+    return {"data": data, "charts": game.charts}
 
 @app.get("/events/{year}")
 def read_item(year:int):
