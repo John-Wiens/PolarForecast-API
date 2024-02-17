@@ -11,7 +11,7 @@ class Crescendo2024(FRCGame):
         ]
 
         self.stats = [
-            CustomStat('rank', self.assign_ranks, report_stat=True, order = 1),
+            CustomStat('Rank', self.assign_ranks, report_stat=True, order = 1),
 
             # Declare all Source Stats
             Stat('autoAmpNoteCount'),
