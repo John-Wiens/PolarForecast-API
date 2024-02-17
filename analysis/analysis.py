@@ -13,7 +13,7 @@ import traceback
 def lookup_game(year: int, event_key:str) -> FRCGame:
     if year in FRC_GAMES:
         return FRC_GAMES[year]
-    elif year + "_" + event_key in FRC_GAMES:
+    elif str(year) + "_" + event_key in FRC_GAMES:
         print("Heads up, The desired event is showing up as a possible custom game. This featureset hasn't been tested yet.")
         return FRC_GAMES[year+"_"+event_key]
     else:
@@ -23,7 +23,7 @@ def lookup_game(year: int, event_key:str) -> FRCGame:
 
 
 def update_event(tba_event):
-    year = tba_event.get('year',2023)
+    year = tba_event.get('year', 2024)
     event_key = tba_event.get('event_code')
     game = lookup_game(year, event_key)
     if game is not None:
@@ -39,7 +39,7 @@ def update(force_update = False):
     print("Updating Events")
     # update_event(2023, "week0")
     today = datetime.now()
-    events = get_year_event_list_tba(2023)
+    events = get_year_event_list_tba(2024)
     events = sorted(events, key=lambda d: get_as_date(d['end_date']))
     keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     for event in events:
@@ -59,8 +59,8 @@ def update(force_update = False):
             #if today >= start:
             # if today >= start and today <= end:
             # if event['event_type'] == 2:
-            if event['event_code'] =='cokc':
-                update_event(event)
+            if event['event_code'] =='week0':
+               update_event(event)
                 
             
 
@@ -72,13 +72,13 @@ def update(force_update = False):
 
 def update_global():
     today = datetime.now()
-    events = get_year_event_list_tba(2023)
+    events = get_year_event_list_tba(2024)
     events = sorted(events, key=lambda d: get_as_date(d['end_date']), reverse = False)
     keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     teams = {}
     for event in events:
         if get_as_date(event.get('end_date')) <  today:
-            new_teams = get_year_event_team_index(2023, event.get('event_code'))
+            new_teams = get_year_event_team_index(2024, event.get('event_code'))
             
                 
             if new_teams is not None:
@@ -103,7 +103,7 @@ def update_global():
         # if i > 100:
         #     break
     ranks = {'data': team_list}
-    store_year_team_ranks(2023, ranks)
+    store_year_team_ranks(2024, ranks)
 
 if __name__ == '__main__':
     pass

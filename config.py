@@ -1,6 +1,7 @@
 import os
 from games.rapid_react_2022 import RapidReact2022
 from games.charged_up_2023 import ChargedUp2023
+from games.crescendo_2024 import Crescendo2024
 
 
 # Specify Deployment Parameters
@@ -32,5 +33,6 @@ MATCH_SANITIZATION = os.environ.get('PF_MATCH_SANITIZATION', True) # Specifies i
 # Specify which games are enabled for this analysis system
 FRC_GAMES = {
     2022: RapidReact2022,
-    2023: ChargedUp2023
+    2023: ChargedUp2023,
+    2024: Crescendo2024,
 }

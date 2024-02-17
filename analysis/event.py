@@ -58,6 +58,7 @@ class Event():
                     cargo = self.teams.get(team_key,{}).get('cargo',0)
                     endgame = self.teams.get(team_key,{}).get('endgame',0)
                     ml.write(f'{auto},{cargo},{endgame},')
+                    
 
                 for team_key in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
                     auto = self.teams.get(team_key,{}).get('auto',0)
@@ -76,8 +77,7 @@ class Event():
     def update_team_info(self):
         matches = self.get_sanitized_matches(self.tba_matches)
         played_matches = self.get_played_matches(matches)
-        teams = self.create_team_lookup(self.tba_teams, self.tba_rankings)
-
+        teams = self.create_team_lookup(self.tba_teams, self.tba_rankings, matches)
 
         if len(teams) == 0:
             return teams
@@ -149,11 +149,17 @@ class Event():
     # Converts TBA Team listing into a dictonary mapping team keys to index's.
     # Adds in Team keys to the mapping to preserve data when compressed to list
     # Add in Rankings
-    def create_team_lookup(self, teams, rankings):
+    def create_team_lookup(self, teams, rankings, matches):
         team_lookup = {}
         index = 0
+        teams_in_matches = self.get_teams_from_matches(matches)
+        team_keys = [ t['key'] for t in teams ]
+        for team in teams_in_matches:
+            if team not in team_keys:
+                teams.append(self.gen_simple_team_record(team))
         event_day = self.get_as_date(self.tba_event.get('start_date'))
         load_historical = not (self.get_as_date(self.tba_event.get('end_date')) < datetime.now())
+        
         for team in teams:
             if load_historical:
                 previous_events = get_data_matching_key(team_key_base.format(year=self.year, event="*", team = team['key']))
@@ -193,7 +199,17 @@ class Event():
         
 
         return team_lookup
+    def get_teams_from_matches(self, matches):
+        teams = set()
+        for match in matches:
+            blue = match.get('alliances',{}).get('blue').get('team_keys',[])
+            red = match.get('alliances',{}).get('red').get('team_keys',[])
+            for elem in (red + blue):
+                teams.add(elem)
+        return teams
 
+    def gen_simple_team_record(self, key):
+        return {'address': None, 'city': '', 'country': '', 'gmaps_place_id': None, 'gmaps_url': None, 'key': key, 'lat': None, 'lng': None, 'location_name': None, 'motto': None, 'name': '', 'nickname': '', 'postal_code': '', 'rookie_year': 0, 'school_name': '', 'state_prov': '', 'team_number': key[4:], 'website': ''}
 
     # Returns a list of stats that use the given solution strategy
     def get_stats_by_solver(self, solver):

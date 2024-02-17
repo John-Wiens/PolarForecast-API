@@ -1,278 +1,94 @@
 from games.frc_game import FRCGame
 from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
 from analysis.simulator import get_random_schedule, simulate_event, get_clean_schedule, get_qual_matches
+from analysis.chart import Chart, ChartField
 import numpy as np
 
-class ChargedUp2023(FRCGame):
+class Crescendo2024(FRCGame):
     def __init__(self):
 
         self.preprocessors = [
-            self.flatten_arrays
         ]
 
         self.stats = [
-            CustomStat('rank', self.assign_ranks, report_stat=True),
+            CustomStat('rank', self.assign_ranks, display_name = 'Rank', report_stat=True, order = 1),
 
             # Declare all Source Stats
-            Stat('_autoCommunity_T_0'),
-            Stat('_autoCommunity_T_1'),
-            Stat('_autoCommunity_T_2'),
-            Stat('_autoCommunity_T_3'),
-            Stat('_autoCommunity_T_4'),
-            Stat('_autoCommunity_T_5'),
-            Stat('_autoCommunity_T_6'),
-            Stat('_autoCommunity_T_7'),
-            Stat('_autoCommunity_T_8'),
-            
-            Stat('_autoCommunity_M_0'),
-            Stat('_autoCommunity_M_1'),
-            Stat('_autoCommunity_M_2'),
-            Stat('_autoCommunity_M_3'),
-            Stat('_autoCommunity_M_4'),
-            Stat('_autoCommunity_M_5'),
-            Stat('_autoCommunity_M_6'),
-            Stat('_autoCommunity_M_7'),
-            Stat('_autoCommunity_M_8'),
+            Stat('autoAmpNoteCount'),
+            Stat('autoSpeakerNoteCount'),
+            # Stat('endGameNoteInTrapPoints'),
+            Stat('teleopAmpNoteCount'),
+            Stat('teleopSpeakerNoteAmplifiedCount'),
+            Stat('teleopSpeakerNoteCount'),
 
-            Stat('_autoCommunity_B_0'),
-            Stat('_autoCommunity_B_1'),
-            Stat('_autoCommunity_B_2'),
-            Stat('_autoCommunity_B_3'),
-            Stat('_autoCommunity_B_4'),
-            Stat('_autoCommunity_B_5'),
-            Stat('_autoCommunity_B_6'),
-            Stat('_autoCommunity_B_7'),
-            Stat('_autoCommunity_B_8'),
-
-            Stat('_teleopCommunity_T_0'),
-            Stat('_teleopCommunity_T_1'),
-            Stat('_teleopCommunity_T_2'),
-            Stat('_teleopCommunity_T_3'),
-            Stat('_teleopCommunity_T_4'),
-            Stat('_teleopCommunity_T_5'),
-            Stat('_teleopCommunity_T_6'),
-            Stat('_teleopCommunity_T_7'),
-            Stat('_teleopCommunity_T_8'),
-
-            Stat('_teleopCommunity_M_0'),
-            Stat('_teleopCommunity_M_1'),
-            Stat('_teleopCommunity_M_2'),
-            Stat('_teleopCommunity_M_3'),
-            Stat('_teleopCommunity_M_4'),
-            Stat('_teleopCommunity_M_5'),
-            Stat('_teleopCommunity_M_6'),
-            Stat('_teleopCommunity_M_7'),
-            Stat('_teleopCommunity_M_8'),
-
-            Stat('_teleopCommunity_B_0'),
-            Stat('_teleopCommunity_B_1'),
-            Stat('_teleopCommunity_B_2'),
-            Stat('_teleopCommunity_B_3'),
-            Stat('_teleopCommunity_B_4'),
-            Stat('_teleopCommunity_B_5'),
-            Stat('_teleopCommunity_B_6'),
-            Stat('_teleopCommunity_B_7'),
-            Stat('_teleopCommunity_B_8'),
 
             # Create Linked Stats
-            LinkedStat('mobility','mobilityRobot', {"Yes":3,"No":0}),
-            LinkedStat('autoChargeStation','autoChargeStationRobot', {"Engaged":12,"Docked":8,"None":0}),
-            LinkedStat('endGameChargeStation','endGameChargeStationRobot', {"Docked":10,"Park":2, "None": 0}),
+            LinkedStat('autoLinePoints','autoLineRobot', {"Yes":2,"No":0}),
+            LinkedStat('climb','endGameRobot',{"Parked":1, "StageLeft":3, "StageRight": 3, "CenterStage":3, "None":1}),
 
+
+            # Calculate Who scored which traps
+            CustomStat('trapNoteCount', self.calc_trap_notes),
             # Aggregate Stats Based upon Placement Position and Type
-            SumStat('autoHighCubes',[
-                '_autoCommunity_T_1',
-                '_autoCommunity_T_4',
-                '_autoCommunity_T_7'
-            ]),
-
-            SumStat('autoHighCones',[
-                '_autoCommunity_T_0',
-                '_autoCommunity_T_2',
-                '_autoCommunity_T_3',
-                '_autoCommunity_T_5',
-                '_autoCommunity_T_6',
-                '_autoCommunity_T_8',
-            ]),
-
-            SumStat('autoMidCubes',[
-                '_autoCommunity_M_1',
-                '_autoCommunity_M_4',
-                '_autoCommunity_M_7'
-            ]),
-
-            SumStat('autoMidCones',[
-                '_autoCommunity_M_0',
-                '_autoCommunity_M_2',
-                '_autoCommunity_M_3',
-                '_autoCommunity_M_5',
-                '_autoCommunity_M_6',
-                '_autoCommunity_M_8',
-            ]),
-
-            SumStat('autoLow',[
-                '_autoCommunity_B_0',
-                '_autoCommunity_B_1',
-                '_autoCommunity_B_2',
-                '_autoCommunity_B_3',
-                '_autoCommunity_B_4',
-                '_autoCommunity_B_5',
-                '_autoCommunity_B_6',
-                '_autoCommunity_B_7',
-                '_autoCommunity_B_8',
-            ]),
-
-            SumStat('teleopHighCubes',[
-                '_teleopCommunity_T_1',
-                '_teleopCommunity_T_4',
-                '_teleopCommunity_T_7'
-            ]),
-
-            SumStat('teleopHighCones',[
-                '_teleopCommunity_T_0',
-                '_teleopCommunity_T_2',
-                '_teleopCommunity_T_3',
-                '_teleopCommunity_T_5',
-                '_teleopCommunity_T_6',
-                '_teleopCommunity_T_8',
-            ]),
-
-            SumStat('teleopMidCubes',[
-                '_teleopCommunity_M_1',
-                '_teleopCommunity_M_4',
-                '_teleopCommunity_M_7'
-            ]),
-
-            SumStat('teleopMidCones',[
-                '_teleopCommunity_M_0',
-                '_teleopCommunity_M_2',
-                '_teleopCommunity_M_3',
-                '_teleopCommunity_M_5',
-                '_teleopCommunity_M_6',
-                '_teleopCommunity_M_8',
-            ]),
-
-            SumStat('teleopLow',[
-                '_teleopCommunity_B_0',
-                '_teleopCommunity_B_1',
-                '_teleopCommunity_B_2',
-                '_teleopCommunity_B_3',
-                '_teleopCommunity_B_4',
-                '_teleopCommunity_B_5',
-                '_teleopCommunity_B_6',
-                '_teleopCommunity_B_7',
-                '_teleopCommunity_B_8',
-            ]),
-            SumStat('autoElementsScored',[
-                'autoLow',
-                'autoMidCubes',
-                'autoMidCones',
-                'autoHighCubes',
-                'autoMidCones',
-            ]),
-            
-            SumStat('teleopElementsScored',[
-                'teleopLow',
-                'teleopMidCubes',
-                'teleopMidCones',
-                'teleopHighCubes',
-                'teleopHighCones',
-            ]),
-
-            SumStat('elementsScored',[
-                'teleopElementsScored',
-                'autoElementsScored',
-            ], report_stat = True, display_name="Elements"),
-
-            CustomStat('links', self.calc_links),
-            SumStat('linkPoints',['links'],display_name="Links", weights = [5], report_stat = True),
-
             SumStat('autoPoints',[
-                'autoHighCubes',
-                'autoHighCones',
-                'autoMidCubes',
-                'autoMidCones',
-                'autoLow',
-                'mobility',
-                'autoChargeStation'
-            ], weights = [
-                6,6,4,4,3,1,1
-            ],display_name="Auto", report_stat = True),
+                'autoAmpNoteCount',
+                'autoLinePoints',
+                'autoSpeakerNoteCount',
+            ], weights = [2,1,5], order=3),
 
             SumStat('teleopPoints',[
-                'teleopHighCubes',
-                'teleopHighCones',
-                'teleopMidCubes',
-                'teleopMidCones',
-                'teleopLow',
+                'teleopSpeakerNoteAmplifiedCount',
+                'teleopSpeakerNoteCount',
+                'teleopAmpNoteCount',
             ], weights = [
-                5,5,3,3,2
-            ],display_name="Teleop", report_stat = True),
-
-            
-
-            
+                5,2,1
+            ],
+            display_name="Teleop", report_stat = True, order=4),
 
             SumStat('endgamePoints',[
-                'endGameChargeStation'
-            ],display_name="End Game", report_stat = True),
+                'climb',
+                'trapNoteCount',
+            ], 
+            weights = [1,5],
+            display_name="End Game", report_stat = True, order=5),
+
+
+            SumStat('noteCount',[
+                'trapNoteCount',
+                'autoAmpNoteCount',
+                'autoSpeakerNoteCount',
+                'teleopAmpNoteCount',
+                'teleopSpeakerNoteCount',
+                'teleopSpeakerNoteAmplifiedCount'
+            ], report_stat = True, display_name = 'Notes', order=2),
+
 
             SumStat('OPR',[
                 'teleopPoints',
                 'autoPoints',
-                'endgamePoints',
-                'linkPoints'
-            ], display_name="OPR", report_stat = True),
+                'endgamePoints'
+            ], display_name="OPR", report_stat = True, order=0),
 
-            SumStat('simulatedRanking',[]),
-            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
-            
-
-            
-            
-
-            
-            # LinkedStat('autoChargeStation','autoCharageStationRobot', {"Yes":2,"None":0}),
-            
-            
+            # 
+            # SumStat('simulatedRanking',[]),
+            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
+            # PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
         ]
 
-    def flatten_arrays(self, played_matches:list, teams:dict):
-        for match in played_matches:
-            for color in ['blue','red']:
-                for gamemode_key in ['autoCommunity','teleopCommunity']:
-                    for top_middle_bottom in ['B','M','T']:
-                        score_array = match.get('score_breakdown',{}).get(color,{}).get(gamemode_key,{}).get(top_middle_bottom,[])
-                        for index, elem in enumerate(score_array):
-                            value = 0 
-                            if elem != "None":
-                                value = 1
-                            else:
-                                value = 0
+        self.charts = [
+            Chart('OPR', [
+                ChartField('teleopPoints', display_text='Teleop'),
+                ChartField('autoPoints', display_text='Auto'),
+                ChartField('endgamePoints', display_text='EndGame')
+            ])
+        ]
 
-                            match['score_breakdown'][color][f'_{gamemode_key}_{top_middle_bottom}_{index}'] = value
-        
-                color_performance = match.get('score_breakdown',{}).get(color,{})
-                if color_performance.get('autoBridgeState','Level') == 'Level':
-                    for i in range(0,3):
-                        if color_performance.get(f'autoChargeStationRobot{i}') == 'Docked':
-                            match['score_breakdown'][color][f'autoChargeStationRobot{index}'] = 'Engaged'
-                        
-        # print("\n\n\n====================\n\n\n", played_matches)
-        return played_matches, teams
-
-    # Computes Auto Charging Station points allocations
-    def calc_links(self, played_matches:list, teams:list, stat:dict, rankings:dict)-> dict:
-        
+  
+    # Performs best guess calculations on who is scoring each trap each match
+    def calc_trap_notes(self, played_matches:list, teams:list, stat:dict, rankings:dict) -> dict:
         for team in teams:
             stats = teams[team]
-            
-            high_links = float(min(stats.get('teleopHighCubes',0) + stats.get('autoHighCubes'), (stats.get('teleopHighCones',0) + stats.get('autoHighCubes'))/2.0))
-            mid_links = float(min(stats.get('teleopMidCubes',0) + stats.get('autoMidCubes'), (stats.get('teleopMidCones',0) + stats.get('autoMidCubes'))/2.0))
-            low_links = float(stats.get('teleopLow') + stats.get('autoLow'))/3.0
-
-            stats['links'] = high_links + mid_links + low_links
+            stats['trapNoteCount'] = 0
         return teams
         
 
