@@ -5,11 +5,12 @@ from analysis.solver import SMART_SOLVER, LINKED_SOLVER, SUM_SOLVER, CUSTOM_SOLV
 
 # Class to Encapsulate the possible ways that a given metric can be solved for. 
 class Stat():
-    def __init__(self, stat_key, solve_strategy=SMART_SOLVER, display_name=None, report_stat = False):
+    def __init__(self, stat_key, solve_strategy=SMART_SOLVER, display_name=None, report_stat = False, order = -1):
         self.stat_key = stat_key
         
         self.solve_strategy = solve_strategy
         self.report_stat = report_stat
+        self.order = order
         
         if display_name is None:
             self.display_name = stat_key
@@ -22,7 +23,8 @@ class Stat():
             "solve_strategy": self.solve_strategy,
             "report_stat": self.report_stat,
             "display_name": self.display_name,
-            "stat": self.get_stat_specific_description()
+            "stat": self.get_stat_specific_description(),
+            "order": self.order
         }
 
     def get_stat_specific_description(self) -> dict:
@@ -40,8 +42,8 @@ class LinkedStat(Stat):
 
 # Subclass of Stat, used for computing metrics that are the sum of other metrics. This is so common a shorthand class was made for it. 
 class SumStat(Stat):
-    def __init__(self, stat_key:str, component_stats:list, weights:list = None, display_name:str=None, report_stat:str = False):
-        super().__init__(stat_key, solve_strategy=SUM_SOLVER, display_name = display_name, report_stat = report_stat)
+    def __init__(self, stat_key:str, component_stats:list, weights:list = None, display_name:str=None, report_stat:str = False, order=-1):
+        super().__init__(stat_key, solve_strategy=SUM_SOLVER, display_name = display_name, report_stat = report_stat, order=order)
         self.component_stats = component_stats
         
         if weights is None:
@@ -60,16 +62,16 @@ class SumStat(Stat):
 
 # Subclass of Stat, used for computing custom metrics based on an arbitrary function. 
 class CustomStat(Stat):
-    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False):
-        super().__init__(stat_key, solve_strategy=CUSTOM_SOLVER, display_name = display_name, report_stat = report_stat)
+    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False, order=-1):
+        super().__init__(stat_key, solve_strategy=CUSTOM_SOLVER, display_name = display_name, report_stat = report_stat, order=order)
         self.solve_function = solve_function
 
     def solve_function(matches, teams):
         pass
 
 class PostStat(Stat):
-    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False):
-        super().__init__(stat_key, solve_strategy=POST_SOLVER, display_name = display_name, report_stat = report_stat)
+    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False, order=-1):
+        super().__init__(stat_key, solve_strategy=POST_SOLVER, display_name = display_name, report_stat = report_stat, order=order)
         self.solve_function = solve_function
 
     def solve_function(matches, teams):
@@ -77,8 +79,8 @@ class PostStat(Stat):
 
 
 class RankStat(Stat):
-    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False):
-        super().__init__(stat_key, solve_strategy=CUSTOM_SOLVER, display_name = display_name, report_stat = report_stat)
+    def __init__(self, stat_key:str, solve_function, display_name:str=None, report_stat:str = False, order=-1):
+        super().__init__(stat_key, solve_strategy=CUSTOM_SOLVER, display_name = display_name, report_stat = report_stat, order=order)
         self.solve_function = solve_function
 
 
