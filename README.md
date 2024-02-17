@@ -35,4 +35,4 @@ To Simplify data storage all data access should be done using the get and store 
 ## Running the Application
 The PolarForecastAPI can be run using the following command
 
-python3 -m uvicorn main:app --host 0.0.0.0 --port 8000
+python3 -m uvicorn pf_api:app --host 0.0.0.0 --port 8000
