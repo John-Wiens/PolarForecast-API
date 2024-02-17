@@ -103,7 +103,7 @@ def update_global():
         # if i > 100:
         #     break
     ranks = {'data': team_list}
-    store_year_team_ranks(2023, ranks)
+    store_year_team_ranks(2024, ranks)
 
 if __name__ == '__main__':
     pass
