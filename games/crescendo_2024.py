@@ -35,7 +35,7 @@ class Crescendo2024(FRCGame):
                 'autoAmpNoteCount',
                 'autoLinePoints',
                 'autoSpeakerNoteCount',
-            ], weights = [2,1,5], order=3, report_stat = True, order = 4),
+            ], weights = [2,1,5], report_stat = True, order = 4),
 
             SumStat('teleopPoints',[
                 'teleopSpeakerNoteAmplifiedCount',
@@ -71,9 +71,9 @@ class Crescendo2024(FRCGame):
             ], display_name="OPR", report_stat = True, order=0),
 
             # 
-            # SumStat('simulatedRanking',[]),
-            # SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            # PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
+            SumStat('simulatedRanking',[]),
+            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True,order=7),
+            PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True, order =8)
         ]
 
         self.charts = [
@@ -246,91 +246,75 @@ class Crescendo2024(FRCGame):
         print("Average Percentile", avg_percentile / (len(rankings)))
         return teams
 
-    def validate_match(self, match:dict) -> bool:
-        return True
+    # def validate_match(self, match:dict) -> bool:
+    #     return True
 
     def predict_alliance(self, color:str, match:dict, teams:dict, prediction:dict):
 
-        endgame = 0
-        auto_charge_station = 0
+        auto_points = 0
+        teleop_points = 0
+        endgame_points = 0
 
-        auto_elements = 0
+        notes = 0
 
-        high_cubes = 0
-        mid_cubes = 0
+        teleop_speaker_notes = 0
+        teleop_amp_notes = 0
 
-        high_cones = 0
-        mid_cones = 0
+        speaker_during_amp = 0
 
-        low = 0
-        supercharged = 0
+        basic_climbs = 0
+        trap_climbs = 0
+
+
         for team_key in match.get('alliances',{}).get(color,{}).get('team_keys',[]):
             team = teams.get(team_key,{})
-            auto_elements += team.get('autoHighCubes',0) + team.get('autoHighCones',0) + team.get('autoMidCubes',0) + team.get('autoMidCones',0) + team.get('autoLow',0)
-            high_cubes += team.get('autoHighCubes',0) + team.get('teleopHighCubes',0)
-            high_cones += team.get('autoHighCones',0) + team.get('teleopHighCones',0)
+            auto_points += team.get('autoPoints',0)
+            notes += team.get('autoAmpNoteCount',0) + team.get('autoSpeakerNoteCount',0)
+            teleop_speaker_notes += team.get('teleopSpeakerNoteCount',0)
+            teleop_amp_notes += team.get('teleopAmpNoteCount',0)
+            endgame_points += team.get('climb',0) + 5 * team.get('trapNoteCount',0)
 
-            mid_cubes += team.get('autoMidCubes',0) + team.get('teleopMidCubes',0)
-            mid_cones += team.get('autoMidCones',0) + team.get('teleopMidCones',0)
-
-            low += team.get('autoLow',0) + team.get('teleopLow',0)
+            if(team.get('trapNoteCount')) > 0.8:
+                trap_climbs +=1
+            elif(team.get('climb',0)>2.5):
+                basic_climbs +=1
             
-            # endgame += team.get('endgamePoints',0)
-            auto_charge_station = max(auto_charge_station, team.get('autoChargeStation',0))
+            if basic_climbs > 2:
+                endgame_points +=2
 
-        high_cubes = round(high_cubes)
-        high_cones = round(high_cones)
-        mid_cubes = round(mid_cubes)
-        mid_cones = round(mid_cones)
-        low = round(low)
+            if team.get('teleopSpeakerNoteCount',0) > 13:
+                speaker_during_amp += 2 
+            else:
+                speaker_during_amp += 1
 
-        if match.get('comp_level') == 'qm':
-            endgame = 22
-        else:
-            endgame = 30
+        robot_activity = teleop_speaker_notes + teleop_amp_notes
+        notes += robot_activity
+        while robot_activity > 0:
+            if robot_activity > 3:
+                robot_activity -=2
+                teleop_points +=2
 
+                notes_in_speaker = min(robot_activity, min(speaker_during_amp, 4))
+                teleop_points += 5 * notes_in_speaker
+                robot_activity -= notes_in_speaker
 
-        if high_cubes > 3:
-            mid_cubes += high_cubes -3
-            high_cubes = 3
-        
-        if high_cones > 6:
-            mid_cones += high_cones - 6
-            high_cones = 6
-        
-        if mid_cubes > 3:
-            low += mid_cubes - 3
-            mid_cubes = 3
-        
-        if mid_cones > 6:
-            low += mid_cones - 6
-            mid_cones = 3
+            else:
+                teleop_points += 2 * robot_activity
+                robot_activity = 0
 
-        if low > 9:
-            if high_cubes >=3 and high_cones >=3 and mid_cubes >=3 and mid_cones >=3:
-                supercharged = low - 9
-            low = 9
+            
+        score = auto_points + teleop_points + endgame_points
 
-        high_links = int(min(high_cubes, high_cones / 2.0))
-        mid_links = int(min(mid_cubes, mid_cones / 2.0))
-        low_links = int(low / 3.0)
-
-        links = high_links + mid_links + low_links
-
-        score = links * 5 + (high_cubes + high_cones) * 5 + (mid_cubes + mid_cones) * 3 + low * 2 + auto_elements + auto_charge_station + endgame + 3 * supercharged
-
+            
         prediction[f"{color}_teams"] = match.get('alliances',{}).get(color,{}).get('team_keys',[])
         prediction[f"{color}_score"] = round(score,2)
-        prediction[f"{color}_highCubes"] = round(high_cubes,2)
-        prediction[f"{color}_highCones"] = round(high_cones,2)
-        prediction[f"{color}_midCubes"] = round(mid_cubes,2)
-        prediction[f"{color}_midCones"] = round(mid_cones,2)
-        prediction[f"{color}_low"] = round(low)
-        prediction[f"{color}_links"] = round(links)
-        prediction[f"{color}_autoChargeStation"] = round(auto_charge_station,2)
-        prediction[f"{color}_endGame"] = round(endgame,2)
-        prediction[f"{color}_autoElements"] = round(auto_elements,2)
-        prediction[f"{color}_chargeStation"] = round(auto_charge_station) + round(endgame)
+        prediction[f"{color}_notes"] = round(notes,2)
+        prediction[f"{color}_auto"] = round(auto_points,2)
+        prediction[f"{color}_teleop"] = round(teleop_points,2)
+        prediction[f"{color}_endgame"] = round(endgame_points,2)
+        prediction[f"{color}_climbs"] = round(basic_climbs + trap_climbs,2)
+
+
 
         result_time = match.get('post_result_time',-1)
         if result_time != None and result_time > 0 :
@@ -354,8 +338,6 @@ class Crescendo2024(FRCGame):
         self.predict_alliance('red', match, teams, prediction)
         
 
-        
-
         if prediction['blue_score'] > prediction['red_score']:
             prediction['blue_win_rp'] = 2
             prediction['red_win_rp'] = 0
@@ -366,29 +348,26 @@ class Crescendo2024(FRCGame):
             prediction['blue_win_rp'] = 1
             prediction['red_win_rp'] = 1
 
-        if prediction['blue_chargeStation'] > 26:
-            prediction['blue_charge_rp'] = 1
+        if prediction['blue_endgame'] > 10 and prediction['blue_climbs'] >= 2:
+            prediction['blue_harmony_rp'] = 1
         else:
-            prediction['blue_charge_rp'] = 0
+            prediction['blue_harmony_rp'] = 0
         
-        if prediction['red_chargeStation'] > 26:
-            prediction['red_charge_rp'] = 1
+        if prediction['red_endgame'] > 10 and prediction['red_climbs'] >= 2:
+            prediction['red_harmony_rp'] = 1
         else:
-            prediction['red_charge_rp'] = 0
+            prediction['red_harmony_rp'] = 0
 
-        if prediction['blue_links'] >= 6:
-            prediction['blue_link_rp'] = 1
-        elif prediction['red_links'] >= 2 and prediction['blue_links'] >= 5:
-            prediction['blue_link_rp'] = 1
+        if prediction['blue_notes'] >= 18:
+            prediction['blue_melody_rp'] = 1
         else:
-            prediction['blue_link_rp'] = 0
+            prediction['blue_melody_rp'] = 0
 
-        if prediction['red_links'] >= 6:
-            prediction['red_link_rp'] = 1
-        elif prediction['blue_links'] >=2 and prediction['red_links'] >= 5:
-            prediction['red_link_rp'] = 1
+        if prediction['red_notes'] >= 18:
+            prediction['red_melody_rp'] = 1
         else:
-            prediction['red_link_rp'] = 0
+            prediction['red_melody_rp'] = 0
+
 
         return prediction
     
@@ -396,10 +375,10 @@ class Crescendo2024(FRCGame):
         blue_rp = 0
         red_rp = 0
         
-        blue_rp += int(match.get('score_breakdown',{}).get('blue',{}).get('activationBonusAchieved'))
-        blue_rp += int(match.get('score_breakdown',{}).get('blue',{}).get('sustainabilityBonusAchieved'))
-        red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('activationBonusAchieved'))
-        red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('sustainabilityBonusAchieved'))
+        blue_rp += int(match.get('score_breakdown',{}).get('blue',{}).get('melodyBonusAchieved'))
+        blue_rp += int(match.get('score_breakdown',{}).get('blue',{}).get('ensembleBonusAchieved'))
+        red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('melodyBonusAchieved'))
+        red_rp += int(match.get('score_breakdown',{}).get('red',{}).get('ensembleBonusAchieved'))
         # coop_red = match.get('score_breakdown',{}).get('red',{}).get('coopertitionCriteriaMet')
         # coop_blue = match.get('score_breakdown',{}).get('blue',{}).get('coopertitionCriteriaMet')
 
