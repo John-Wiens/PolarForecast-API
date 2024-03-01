@@ -101,14 +101,6 @@ class Crescendo2024(FRCGame):
 
                 trapKeys = ['trapCenterStage', 'trapStageLeft', 'trapStageRight']
 
-                if 'frc1058' in team_keys:
-                    score[trapKeys[0]] = True
-                    score['endGameRobot' + str(team_keys.index('frc1058'))] = 'trapCenterStage'
-                    print("test")
-
-                if 'frc88' in team_keys:
-                    score[trapKeys[0]] = True
-
                 
                 for (j, trapKey) in enumerate(trapKeys):
                     if score.get(trapKey, False):
@@ -132,14 +124,16 @@ class Crescendo2024(FRCGame):
                             team_index = teams[team_key]['_index']
                             team_array[offset + i*3 + j][team_index] = 1                            
         
-        X = nnls(team_array,score_array)[0]
-        # print(X)
+        if num_matches > 0:
+            X = nnls(team_array,score_array)[0]
+            for i, team in enumerate(teams.values()):
+                team['trapNoteCount'] = X[team["_index"]]
+        else:
+            for i, team in enumerate(teams.values()):
+                team['trapNoteCount'] = 0
 
-        for i, team in enumerate(teams.values()):
-            team['trapNoteCount'] = X[team["_index"]]
-            print(team['key'], X[team["_index"]])
-
-
+        
+        
         return teams
 
     
