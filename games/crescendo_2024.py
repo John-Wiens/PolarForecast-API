@@ -35,7 +35,7 @@ class Crescendo2024(FRCGame):
                 'autoAmpNoteCount',
                 'autoLinePoints',
                 'autoSpeakerNoteCount',
-            ], weights = [2,1,5], order=3),
+            ], weights = [2,1,5], order=3, report_stat = True, order = 4),
 
             SumStat('teleopPoints',[
                 'teleopSpeakerNoteAmplifiedCount',
@@ -44,14 +44,14 @@ class Crescendo2024(FRCGame):
             ], weights = [
                 5,2,1
             ],
-            display_name="Teleop", report_stat = True, order=4),
+            display_name="Teleop", report_stat = True, order=5),
 
             SumStat('endgamePoints',[
                 'climb',
                 'trapNoteCount',
             ], 
             weights = [1,5],
-            display_name="End Game", report_stat = True, order=5),
+            display_name="End Game", report_stat = True, order=6),
 
 
             SumStat('noteCount',[
