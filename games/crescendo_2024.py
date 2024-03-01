@@ -2,6 +2,7 @@ from games.frc_game import FRCGame
 from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
 from analysis.simulator import get_random_schedule, simulate_event, get_clean_schedule, get_qual_matches
 from analysis.chart import Chart, ChartField
+from scipy.optimize import nnls
 import numpy as np
 
 class Crescendo2024(FRCGame):
@@ -86,10 +87,83 @@ class Crescendo2024(FRCGame):
   
     # Performs best guess calculations on who is scoring each trap each match
     def calc_trap_notes(self, played_matches:list, teams:list, stat:dict, rankings:dict) -> dict:
-        for team in teams:
-            stats = teams[team]
-            stats['trapNoteCount'] = 0
+        num_matches = len(played_matches)
+        num_teams = len(teams)
+        team_array = np.zeros([num_matches*6, num_teams])
+        score_array = np.zeros(num_matches*6)
+
+        for (i, match) in enumerate(played_matches):
+            for color in ['red', 'blue']:
+                # team_climb_mapping = {}
+                score = match.get('score_breakdown',{}).get(color,{})
+
+                team_keys = match.get('alliances',{}).get(color, {}).get('team_keys',[])
+
+                trapKeys = ['trapCenterStage', 'trapStageLeft', 'trapStageRight']
+
+                if 'frc1058' in team_keys:
+                    score[trapKeys[0]] = True
+                    score['endGameRobot' + str(team_keys.index('frc1058'))] = 'trapCenterStage'
+                    print("test")
+
+                if 'frc88' in team_keys:
+                    score[trapKeys[0]] = True
+
+                
+                for (j, trapKey) in enumerate(trapKeys):
+                    if score.get(trapKey, False):
+                        
+
+                        offset = 0
+                        if color == 'red':
+                            offset = num_matches*3
+
+                        # Setup Score Array
+                        score_array[int(offset + i*3 + j)] = 1
+
+                        # Get the List of Teams who could have scored that trap
+                        possible_traps = self.get_possible_teams_for_trap(trapKey, color, match)
+
+                        print(possible_traps)
+
+                        #
+                        possible_traps = team_keys
+                        for team_key in possible_traps:
+                            team_index = teams[team_key]['_index']
+                            team_array[offset + i*3 + j][team_index] = 1                            
+        
+        X = nnls(team_array,score_array)[0]
+        # print(X)
+
+        for i, team in enumerate(teams.values()):
+            team['trapNoteCount'] = X[team["_index"]]
+            print(team['key'], X[team["_index"]])
+
+
         return teams
+
+    
+
+    def get_possible_teams_for_trap(self, trapKey: str, color: str, match:dict) -> list:
+        team_keys = match.get('alliances',{}).get(color, {}).get('team_keys',[])
+        score = match.get('score_breakdown',{}).get(color,{})
+        mod_trap_key = trapKey[4:]
+        print(mod_trap_key)
+        possibilities = []
+        for (i, key) in enumerate(team_keys):
+            if score.get('endGameRobot' + str(i), 'None') == mod_trap_key:
+                print(key)
+                possibilities.append(key)
+
+        if len(possibilities) == 0:
+            return team_keys
+
+        else:
+            return possibilities
+
+
+
+
         
 
     # Assigns Event Rankings to all the Teams at the event

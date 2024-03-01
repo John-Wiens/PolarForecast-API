@@ -57,9 +57,9 @@ def update(force_update = False):
 
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
-            # if today >= start and today <= end:
+            if today >= start and today <= end:
             # if event['event_type'] == 2:
-            if event['event_code'] =='week0':
+            #if event['event_code'] =='week0':
                update_event(event)
                 
             
