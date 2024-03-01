@@ -113,8 +113,8 @@ def build_score_matrix(matches, teams, stats):
     i = 0
     for match in matches:
         for stat_count, stat in enumerate(stats):
-            score_array[i][stat_count] = match["score_breakdown"]["blue"][stat]
-            score_array[num_matches + i][stat_count] = match["score_breakdown"]["red"][stat]
+            score_array[i][stat_count] = match.get("score_breakdown",{}).get("blue",{}).get(stat,0)
+            score_array[num_matches + i][stat_count] = match.get("score_breakdown",{}).get("red",{}).get(stat,0)
             stat_count +=1
         
         for j in range(0,3):
