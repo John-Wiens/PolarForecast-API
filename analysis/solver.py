@@ -29,8 +29,10 @@ def smart_solve(matches, teams, stats):
             score_array = np.concatenate((score_array, hist_score_array), axis = 0)
 
         X = np.zeros([team_array.shape[1],score_array.shape[1]])
+        
         for i in range(0,score_array.shape[1]):
-            X[:,i] = nnls(team_array,score_array[:,i])[0]
+            if(len(score_array[:,i]) > 0):
+                X[:,i] = nnls(team_array,score_array[:,i])[0]
         return parse_solution(X, teams, stats)
     
 
@@ -53,7 +55,8 @@ def nnls_solve(matches, teams, stats):
     team_array, score_array = build_score_matrix(matches, teams, stats)
     X = np.zeros([team_array.shape[1],score_array.shape[1]])
     for i in range(0,score_array.shape[1]):
-        X[:,i] = nnls(team_array,score_array[:,i])[0]
+        if(len(score_array[:,i]) > 0):
+            X[:,i] = nnls(team_array,score_array[:,i])[0]
     return parse_solution(X, teams, stats)
 
 def parse_solution(solution, teams, stats):

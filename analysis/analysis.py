@@ -59,7 +59,7 @@ def update(force_update = False):
             #if today >= start:
             if today >= start and today <= end:
             # if event['event_type'] == 2:
-            #if event['event_code'] =='week0':
+            # if event['event_code'] =='bcvi':
                update_event(event)
                 
             
