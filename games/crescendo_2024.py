@@ -92,20 +92,23 @@ class Crescendo2024(FRCGame):
         team_array = np.zeros([num_matches*6, num_teams])
         score_array = np.zeros(num_matches*6)
 
+        team_traps = {}
+        ambiguous_traps = 0
+        num_traps = 0
+
         for (i, match) in enumerate(played_matches):
             for color in ['red', 'blue']:
                 # team_climb_mapping = {}
                 score = match.get('score_breakdown',{}).get(color,{})
 
                 team_keys = match.get('alliances',{}).get(color, {}).get('team_keys',[])
-
                 trapKeys = ['trapCenterStage', 'trapStageLeft', 'trapStageRight']
 
                 
                 for (j, trapKey) in enumerate(trapKeys):
                     if score.get(trapKey, False):
                         
-
+                        num_traps +=1
                         offset = 0
                         if color == 'red':
                             offset = num_matches*3
@@ -116,7 +119,13 @@ class Crescendo2024(FRCGame):
                         # Get the List of Teams who could have scored that trap
                         possible_traps = self.get_possible_teams_for_trap(trapKey, color, match)
 
-                        print(possible_traps)
+                        if len(possible_traps) != 1:
+                            ambiguous_traps +=1
+                        else:
+                            if possible_traps[0] in team_traps:
+                                team_traps[possible_traps[0]] += 1
+                            else:
+                                team_traps[possible_traps[0]] = 1
 
                         #
                         possible_traps = team_keys
@@ -125,9 +134,16 @@ class Crescendo2024(FRCGame):
                             team_array[offset + i*3 + j][team_index] = 1                            
         
         if num_matches > 0:
-            X = nnls(team_array,score_array)[0]
-            for i, team in enumerate(teams.values()):
-                team['trapNoteCount'] = min(X[team["_index"]],1)
+            if ambiguous_traps <= num_traps / 2:
+                for i, team in enumerate(teams.values()):
+                    if team['key'] in team_traps:
+                        team['trapNoteCount'] = team_traps[team['key']] / len(team['_autoLinePoints_list'])
+                    else:
+                        team['trapNoteCount'] = 0
+            else:
+                X = nnls(team_array,score_array)[0]
+                for i, team in enumerate(teams.values()):
+                    team['trapNoteCount'] = X[team["_index"]]
         else:
             for i, team in enumerate(teams.values()):
                 team['trapNoteCount'] = 0
@@ -142,11 +158,10 @@ class Crescendo2024(FRCGame):
         team_keys = match.get('alliances',{}).get(color, {}).get('team_keys',[])
         score = match.get('score_breakdown',{}).get(color,{})
         mod_trap_key = trapKey[4:]
-        print(mod_trap_key)
         possibilities = []
         for (i, key) in enumerate(team_keys):
-            if score.get('endGameRobot' + str(i), 'None') == mod_trap_key:
-                print(key)
+            # print("Mod Key: " + mod_trap_key, score.get('endGameRobot' + str(i), 'Donut'))
+            if score.get('endGameRobot' + str(i+1), 'None') == mod_trap_key:
                 possibilities.append(key)
 
         if len(possibilities) == 0:
