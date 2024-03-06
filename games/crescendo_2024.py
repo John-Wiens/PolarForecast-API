@@ -127,7 +127,7 @@ class Crescendo2024(FRCGame):
         if num_matches > 0:
             X = nnls(team_array,score_array)[0]
             for i, team in enumerate(teams.values()):
-                team['trapNoteCount'] = max(X[team["_index"]],1)
+                team['trapNoteCount'] = min(X[team["_index"]],1)
         else:
             for i, team in enumerate(teams.values()):
                 team['trapNoteCount'] = 0
