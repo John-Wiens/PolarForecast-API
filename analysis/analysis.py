@@ -59,7 +59,7 @@ def update(force_update = False):
             #if today >= start:
             if today >= start and today <= end:
             # if event['event_type'] == 2:
-            # if event['event_code'] =='utwv':
+            #if event['event_code'] =='isde3':
                 update_event(event)
                 
             
