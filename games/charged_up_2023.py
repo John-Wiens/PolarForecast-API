@@ -1,6 +1,7 @@
 from games.frc_game import FRCGame
 from analysis.stat import Stat, LinkedStat, SumStat, CustomStat, PostStat
 from analysis.simulator import get_random_schedule, simulate_event, get_clean_schedule, get_qual_matches
+from analysis.chart import Chart, ChartField
 import numpy as np
 
 class ChargedUp2023(FRCGame):
@@ -209,9 +210,41 @@ class ChargedUp2023(FRCGame):
                 5,5,3,3,2
             ],display_name="Teleop", report_stat = True),
 
+            SumStat('elementsLow',[
+                'autoLow',
+                'teleopLow'
+            ]),
             
+            SumStat('elementsMid',[
+                'autoMidCones',
+                'autoMidCubes',
+                'teleopMidCones',
+                'teleopMidCubes'
+            ]),
+            
+            SumStat('elementsHigh',[
+                'autoHighCones',
+                'autoHighCubes',
+                'teleopHighCubes',
+                'teleopHighCones'
+            ]),
+            
+            SumStat('cubes',[
+                'autoLow',
+                'teleopLow',
+                'autoMidCubes',
+                'teleopMidCubes',
+                'autoHighCubes',
+                'teleopHighCubes'
+            ]),
+            
+            SumStat('cones',[
+                'autoMidCones',
+                'teleopMidCones',
+                'autoHighCones',
+                'teleopHighCones'
+            ]),
 
-            
 
             SumStat('endgamePoints',[
                 'endGameChargeStation'
@@ -236,6 +269,28 @@ class ChargedUp2023(FRCGame):
             # LinkedStat('autoChargeStation','autoCharageStationRobot', {"Yes":2,"None":0}),
             
             
+        ]
+        
+        self.charts = [
+            Chart('OPR', [
+                ChartField('teleopPoints', display_text='Teleop'),
+                ChartField('autoPoints', display_text='Auto'),
+                ChartField('endgamePoints', display_text='EndGame'),
+                ChartField('linkPoints', display_text='Links')],
+            ),
+            Chart('Elements Scoring Location', [
+                ChartField('elementsLow', display_text='Low'),
+                ChartField('elementsMid', display_text='Middle'),
+                ChartField('elementsHigh', display_text='High')],
+            ),
+            Chart('Elements Scoring Period', [
+                ChartField('autoElementsScored', display_text='Auto'),
+                ChartField('teleopElementsScored', display_text='Teleop')],
+            ),
+            Chart('Elements Scoring Type', [
+                ChartField('cones', display_text='Cones'),
+                ChartField('cubes', display_text='Cubes')],
+            ),
         ]
 
     def flatten_arrays(self, played_matches:list, teams:dict):

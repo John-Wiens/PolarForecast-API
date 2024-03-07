@@ -35,7 +35,7 @@ class Crescendo2024(FRCGame):
                 'autoAmpNoteCount',
                 'autoLinePoints',
                 'autoSpeakerNoteCount',
-            ], weights = [2,1,5], report_stat = True, order = 4),
+            ], display_name="Auto", weights = [2,1,5], report_stat = True, order = 4),
 
             SumStat('teleopPoints',[
                 'teleopSpeakerNoteAmplifiedCount',
@@ -62,7 +62,27 @@ class Crescendo2024(FRCGame):
                 'teleopSpeakerNoteCount',
                 'teleopSpeakerNoteAmplifiedCount'
             ], report_stat = True, display_name = 'Notes', order=2),
+            
+            SumStat('ampNoteCount',[
+                'autoAmpNoteCount',
+                'teleopAmpNoteCount',
+            ], report_stat = False, display_name="Amp Notes"),
+            
+            SumStat('speakerNoteCount',[
+                'autoSpeakerNoteCount',
+                'teleopSpeakerNoteCount',
+            ], report_stat = False, display_name="Speaker Notes"),
 
+            SumStat('autoNoteCount',[
+                'autoAmpNoteCount',
+                'autoSpeakerNoteCount',
+            ], report_stat = False, display_name="Auto Notes"),
+            
+            SumStat('teleopNoteCount',[
+                'teleopAmpNoteCount',
+                'teleopSpeakerNoteCount',
+            ], report_stat = False, display_name="Teleop Notes"),
+            
 
             SumStat('OPR',[
                 'teleopPoints',
@@ -74,15 +94,32 @@ class Crescendo2024(FRCGame):
             SumStat('simulatedRanking',[]),
             SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True,order=7),
             PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True, order =8)
+            
+            
+            
         ]
 
         self.charts = [
             Chart('OPR', [
                 ChartField('teleopPoints', display_text='Teleop'),
                 ChartField('autoPoints', display_text='Auto'),
-                ChartField('endgamePoints', display_text='EndGame')
-            ])
+                ChartField('endgamePoints', display_text='EndGame')],
+            ),
+            Chart('Elements Scoring Location', [
+                ChartField('ampNoteCount', display_text='Amp'),
+                ChartField('speakerNoteCount', display_text='Speaker'),
+                ChartField('trapNoteCount', display_text='Trap')],
+            ),
+            Chart('Elements Scoring Period', [
+                ChartField('autoNoteCount', display_text='Auto'),
+                ChartField('teleopNoteCount', display_text='Teleop'),
+                ChartField('trapNoteCount', display_text='EndGame')],
+            ),
         ]
+        # 'Elements Scoring Period', [
+                # ChartField('teleopPoints', display_text='Teleop'),
+                # ChartField('autoPoints', display_text='Auto'),
+                # ChartField('endgamePoints', display_text='EndGame')],
 
   
     # Performs best guess calculations on who is scoring each trap each match
