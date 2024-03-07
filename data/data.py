@@ -18,7 +18,7 @@ global_rank_list = "/year/{year}/teams"
 
 search_keys_base: str = "/keys/{key}"
 search_key_lookup: str = "/keys"
-search_key_cache: str = "/keys_cache"
+search_key_cache: str = "/search_keys_cache"
 
 
 
