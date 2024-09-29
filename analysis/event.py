@@ -78,7 +78,9 @@ class Event():
         matches = self.get_sanitized_matches(self.tba_matches)
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings, matches)
+        print(matches[0])
 
+        print(len(played_matches))
         if len(teams) == 0:
             return teams
 
@@ -86,13 +88,14 @@ class Event():
             played_matches, teams = preprocessor(played_matches, teams)
 
         smart_solve_stats = self.get_stat_names(self.get_stats_by_solver(SMART_SOLVER))
+
         link_solve_stats = self.get_stats_by_solver(LINKED_SOLVER)
         
         # Precompute Direct Stats
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
-
         
+        print(teams)
 
         for stat in self.game.stats:
             if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
@@ -139,8 +142,10 @@ class Event():
     def get_played_matches(self, matches):
         played_matches = []
         for match in matches:
+            #print("\n\n",matches)
             result_time = match.get("post_result_time",-1)
-            if result_time is not None and result_time > 0: #and match['comp_level'] == 'qm'
+            #if result_time is not None and result_time > 0: #and match['comp_level'] == 'qm'
+            if match.get("alliances",{}).get('blue',{}).get('score',-1) >= 0:
                 played_matches.append(match)
         return played_matches
 
