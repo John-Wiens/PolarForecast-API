@@ -107,12 +107,15 @@ def build_score_matrix(matches, teams, stats):
     num_matches = len(matches)
     num_stats = len(stats)
 
+    print(num_matches)
+
     team_array = np.zeros([num_matches*2, num_teams])
     score_array = np.zeros([num_matches*2, num_stats])
 
     i = 0
     for match in matches:
         for stat_count, stat in enumerate(stats):
+            print(match)
             score_array[i][stat_count] = match.get("score_breakdown",{}).get("blue",{}).get(stat,0)
             score_array[num_matches + i][stat_count] = match.get("score_breakdown",{}).get("red",{}).get(stat,0)
             stat_count +=1
@@ -125,7 +128,7 @@ def build_score_matrix(matches, teams, stats):
             
         i+=1
 
-    
+    print(team_array)    
 
     return team_array, score_array
 

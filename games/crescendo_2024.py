@@ -467,4 +467,5 @@ class Crescendo2024(FRCGame):
         passing = True
         passing = 'frc0' not in match.get('alliances',{}).get('blue',{}).get('team_keys',[]) and passing
         passing = 'frc0' not in match.get('alliances',{}).get('red',{}).get('team_keys',[]) and passing
+        print(passing)
         return passing
