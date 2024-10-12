@@ -59,7 +59,7 @@ def update(force_update = False):
             #if today >= start:
             #if today >= start and today <= end:
             # if event['event_type'] == 2:
-            if event['event_code'] =='cc':
+            if event['event_code'] =='cokc':
                 update_event(event)
                 
             
