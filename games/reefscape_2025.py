@@ -334,13 +334,6 @@ class Reefscape2025(FRCGame):
         return teams
 
     def calc_schedule(self, matches:list, teams:list, stat:dict, rankings:dict)-> dict:
-        # team_rps = {}
-        # for team in teams:
-        #     team_rps[team] = {'rp':0}
-
-
-        # for match in matches:
-        #     for color in ['red','blue']:
         clean_matches = get_clean_schedule(matches)
         qual_matches = get_qual_matches(matches)
         if len(clean_matches) == 0:
@@ -381,31 +374,25 @@ class Reefscape2025(FRCGame):
         schedule_adjust = 0
         for rank in ranks:
             teams[rank[0]]['simulatedRanking'] = count
-            # print(sum(rps[rank[0]]) / num_sims, expected_rp[rank[0]])
             schedule_adjust += expected_rp[rank[0]] / (sum(rps[rank[0]]) / num_sims)
             count +=1
 
         
         schedule_adjust = schedule_adjust / (len(ranks))
 
-        print(schedule_adjust)
         count = 1
         avg_percentile = 0
 
         for rank in rankings:
             teams[rank[0]]['expectedRanking'] = count
-            # teams[rank[0]]['schedule'] = teams[rank[0]]['simulatedRanking'] - count
             rp_distribution = sorted(rps[rank[0]])
             # lb = np.searchsorted(rp_distribution, expected_rp)
             percentile = (np.searchsorted(rp_distribution, expected_rp[rank[0]], side="left")) / num_sims * 100
 
-            # print(rank[0], percentile)
             teams[rank[0]]['schedule'] = percentile
             avg_percentile += percentile
-            print(count, rank[0][3:], qual_rp[rank[0]], percentile, teams[rank[0]])
             count +=1
             
-        print("Average Percentile", avg_percentile / (len(rankings)))
         return teams
 
     def validate_match(self, match:dict) -> bool:
@@ -527,10 +514,52 @@ class Reefscape2025(FRCGame):
 
 
         # Assign RP for Achiving the Coral RP
+        coopertition = prediction['red_processorAlgae'] >= 2 and prediction['blue_processorAlgae'] >=2
+        blue_levels = int(prediction['blue_l4Corral'] >= 5) + int(prediction['blue_l3Corral'] >= 5) + int(prediction['blue_l2Corral'] >= 5) + int(prediction['blue_l1Corral']>= 5)
+        red_levels = int(prediction['red_l4Corral']>= 5) + int(prediction['red_l3Corral'] >= 5) + int(prediction['red_l2Corral'] >= 5) + int(prediction['red_l1Corral'] >= 5)
+
+        if coopertition:
+            if blue_levels >=3:
+                prediction['blue_corral_rp'] = 1
+            else:
+                prediction['blue_corral_rp'] = 0
+
+            if red_levels >=3:
+                prediction['red_corral_rp'] = 1
+            else:
+                prediction['red_corral_rp'] = 0
+        else:
+            if blue_levels >=4:
+                prediction['blue_corral_rp'] = 1
+            else:
+                prediction['blue_corral_rp'] = 0
+
+            if red_levels >=4:
+                prediction['red_corral_rp'] = 1
+            else:
+                prediction['red_corral_rp'] = 0
 
         # Assign RP for Achiving the Auto RP
+        if prediction['blue_autoLeave'] >= 7:
+            prediction['blue_auto_rp'] =1
+        else:
+            prediction['blue_auto_rp'] =0
+
+        if prediction['red_autoLeave'] >= 7:
+            prediction['red_auto_rp'] =1
+        else:
+            prediction['red_auto_rp'] =0
 
         # Assign RP for Achieving the Climb RP
+        if prediction['blue_endGameBarge'] >= 7:
+            prediction['blue_barge_rp'] =1
+        else:
+            prediction['blue_barge_rp'] =0
+
+        if prediction['red_endGameBarge'] >= 7:
+            prediction['red_barge_rp'] =1
+        else:
+            prediction['red_barge_rp'] =0
 
         return prediction
     

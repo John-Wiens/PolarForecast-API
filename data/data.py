@@ -93,11 +93,8 @@ def get_year_event_team_matches(year: int, event:str, team:str) -> list:
 
     output = []
     for match in matches:
-        print(match.get('alliances',{}).get('blue',{}).get('team_keys',[]))
-        print(team)
         if team in match.get('alliances',{}).get('blue',{}).get('team_keys',[]) or team in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
             output.append(match)
-            print(match)
 
     return output
 
