@@ -23,7 +23,7 @@ def lookup_game(year: int, event_key:str) -> FRCGame:
 
 
 def update_event(tba_event):
-    year = tba_event.get('year', 2024)
+    year = tba_event.get('year', 2025)
     event_key = tba_event.get('event_code')
     game = lookup_game(year, event_key)
     if game is not None:
@@ -39,7 +39,7 @@ def update(force_update = False):
     print("Updating Events")
     # update_event(2023, "week0")
     today = datetime.now()
-    events = get_year_event_list_tba(2024)
+    events = get_year_event_list_tba(2025)
     events = sorted(events, key=lambda d: get_as_date(d['end_date']))
     keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     for event in events:
@@ -59,7 +59,7 @@ def update(force_update = False):
             #if today >= start:
             #if today >= start and today <= end:
             # if event['event_type'] == 2:
-            if event['event_code'] =='cokc':
+            if event['event_code'] =='week0':
                 update_event(event)
                 
             

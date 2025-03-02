@@ -12,7 +12,6 @@ class Event():
     game: FRCGame
 
     def __init__(self, tba_event:dict, game:FRCGame):
-        print(tba_event)
         self.tba_event = tba_event
         self.year = tba_event.get('year',0)
         self.event_key = tba_event.get('event_code','')
@@ -78,9 +77,6 @@ class Event():
         matches = self.get_sanitized_matches(self.tba_matches)
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings, matches)
-        print(matches[0])
-
-        print(len(played_matches))
         if len(teams) == 0:
             return teams
 
@@ -94,8 +90,6 @@ class Event():
         # Precompute Direct Stats
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
-        
-        print(teams)
 
         for stat in self.game.stats:
             if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
