@@ -237,6 +237,10 @@ class Reefscape2025(FRCGame):
                 'teleopCorralScored',
                 '_teamNetAlgae',
                 'wallAlgaeCount',
+            ]),
+
+            SumStat('netAlgae',[
+                '_teamNetAlgae',
             ]),            
 
             SumStat('totalCoralScored',[
@@ -309,8 +313,8 @@ class Reefscape2025(FRCGame):
                 ],
             ),
             Chart('Algae Scoring Location', [
-                ChartField('_teamNetAlgae', display_text='Net'),
-                ChartField('wallAlgaeCount', display_text='Processor'),
+                ChartField('wallAlgaeCount', display_text='Processor Algae'),
+                ChartField('netAlgae', display_text='Net Algae'),
                 ],
             ),
             Chart('Elements Scoring Period', [
@@ -479,7 +483,7 @@ class Reefscape2025(FRCGame):
                 barge += team.get('endGameBarge',0)
                 autoLeave += team.get('autoLine',0)
 
-                netAlgae += float(team.get("_teamNetAlgae"))
+                netAlgae += float(team.get("netAlgae"))
                 processorAlgae += float(team.get('wallAlgaeCount'))
 
 
