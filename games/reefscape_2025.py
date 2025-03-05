@@ -13,7 +13,7 @@ class Reefscape2025(FRCGame):
         ]
 
         self.stats = [
-            CustomStat('rank', self.assign_ranks, report_stat=True, display_name='Rank'),
+            CustomStat('rank', self.assign_ranks, report_stat=True, display_name='Rank', order = 1),
 
             # Declare all Source Stats
             Stat('_autoReef_topRow_0'),
@@ -242,12 +242,12 @@ class Reefscape2025(FRCGame):
             SumStat('totalCoralScored',[
                 'autoCorralScored',
                 'teleopCorralScored',
-            ], report_stat = True, display_name="Coral"),
+            ], report_stat = True, display_name="Coral", order = 6),
 
             SumStat('totalAlgaeScored',[
                 '_teamNetAlgae',
                 'wallAlgaeCount',
-            ], report_stat = True, display_name="Algae"),
+            ], report_stat = True, display_name="Algae", order = 7),
 
             SumStat('autoPoints',[
                 'autoL4Corral',
@@ -257,7 +257,7 @@ class Reefscape2025(FRCGame):
                 'autoLine',
             ], weights = [
                 7,6,4,3,3
-            ],display_name="Auto", report_stat = True),
+            ],display_name="Auto", report_stat = True, order = 3),
 
             SumStat('teleopPoints',[
                 'teleopL4Corral',
@@ -268,22 +268,22 @@ class Reefscape2025(FRCGame):
                 'wallAlgaeCount'
             ], weights = [
                 5,4,3,2,4,2
-            ],display_name="Teleop", report_stat = True),
+            ],display_name="Teleop", report_stat = True, order = 4),
 
 
             SumStat('endgamePoints',[
                 'endGameBarge'
-            ],display_name="End Game", report_stat = True),
+            ],display_name="End Game", report_stat = True, order = 5),
 
             SumStat('OPR',[
                 'teleopPoints',
                 'autoPoints',
                 'endgamePoints'
-            ], display_name="OPR", report_stat = True),
+            ], display_name="OPR", report_stat = True, order = 2),
 
             SumStat('simulatedRanking',[]),
-            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True),
-            PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True)
+            SumStat('expectedRanking',[], display_name='Expected Ranking', report_stat = True, order = 8),
+            PostStat('schedule', self.calc_schedule, display_name='Schedule', report_stat = True, order = 9)
             
 
             
