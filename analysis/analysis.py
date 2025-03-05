@@ -72,13 +72,13 @@ def update(force_update = False):
 
 def update_global():
     today = datetime.now()
-    events = get_year_event_list_tba(2024)
+    events = get_year_event_list_tba(2025)
     events = sorted(events, key=lambda d: get_as_date(d['end_date']), reverse = False)
     keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     teams = {}
     for event in events:
         if get_as_date(event.get('end_date')) <  today:
-            new_teams = get_year_event_team_index(2024, event.get('event_code'))
+            new_teams = get_year_event_team_index(2025, event.get('event_code'))
             
                 
             if new_teams is not None:
@@ -103,7 +103,7 @@ def update_global():
         # if i > 100:
         #     break
     ranks = {'data': team_list}
-    store_year_team_ranks(2024, ranks)
+    store_year_team_ranks(2025, ranks)
 
 if __name__ == '__main__':
     pass
