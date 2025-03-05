@@ -13,7 +13,7 @@ class Reefscape2025(FRCGame):
         ]
 
         self.stats = [
-            CustomStat('rank', self.assign_ranks, report_stat=True),
+            CustomStat('rank', self.assign_ranks, report_stat=True, display_name='Rank'),
 
             # Declare all Source Stats
             Stat('_autoReef_topRow_0'),
@@ -104,7 +104,7 @@ class Reefscape2025(FRCGame):
 
             # Create Linked Stats
             LinkedStat('autoLine','autoLineRobot', {"Yes":3,"No":0}),
-            LinkedStat('endGameBarge','endGameRobot', {"DeepCage":12,"ShallowCage":6, "Parked": 0}),
+            LinkedStat('endGameBarge','endGameRobot', {"DeepCage":12,"ShallowCage":6, "Parked": 2}),
 
             # Aggregate Stats Based upon Placement Position and Type
             SumStat('autoL4Corral',[
@@ -236,10 +236,10 @@ class Reefscape2025(FRCGame):
             ],display_name="Auto", report_stat = True),
 
             SumStat('teleopPoints',[
-                'autoL4Corral',
-                'autoL3Corral',
-                'autoL2Corral',
-                '_autoReef_trough',
+                'teleopL4Corral',
+                'teleopL3Corral',
+                'teleopL2Corral',
+                '_teleopReef_trough',
                 '_teamNetAlgae',
                 'wallAlgaeCount'
             ], weights = [
@@ -296,18 +296,24 @@ class Reefscape2025(FRCGame):
     def flatten_arrays(self, played_matches:list, teams:dict):
         for match in played_matches:
             for color in ['blue','red']:
-                for gamemode_key in ['autoReef','teleopReef']:
-                    for top_middle_bottom in ['botRow','midRow','topRow']:
-                        score_array = match.get('score_breakdown',{}).get(color,{}).get(gamemode_key,{}).get(top_middle_bottom,[])
-                        for index, elem in enumerate(score_array):
-                            value = 0 
-                            if elem:
-                                value = 1
+                # for gamemode_key in ['autoReef','teleopReef']:
+                for top_middle_bottom in ['botRow','midRow','topRow']:
+                    teleop_score_array = match.get('score_breakdown',{}).get(color,{}).get('teleopReef',{}).get(top_middle_bottom,[])
+                    auto_score_array = match.get('score_breakdown',{}).get(color,{}).get('autoReef',{}).get(top_middle_bottom,[])
+                    for index, (teleop_elem, auto_elem) in enumerate(zip(teleop_score_array, auto_score_array)):
+                        auto_value = 0
+                        teleop_value = 0
 
-                            match['score_breakdown'][color][f'_{gamemode_key}_{top_middle_bottom}_{index}'] = value
+                        if auto_score_array[auto_elem]:
+                            auto_value = 1
+                        elif teleop_score_array[teleop_elem]:
+                            teleop_value = 1
+                        
+                        match['score_breakdown'][color][f'_autoReef_{top_middle_bottom}_{index}'] = auto_value
+                        match['score_breakdown'][color][f'_teleopReef_{top_middle_bottom}_{index}'] = teleop_value
 
-                    match['score_breakdown'][color][f'_{gamemode_key}_trough'] = match.get('score_breakdown',{}).get(color,{}).get(gamemode_key,{}).get("trough",0)
-        
+                match['score_breakdown'][color][f'_autoReef_trough'] = match.get('score_breakdown',{}).get(color,{}).get('autoReef',{}).get("trough",0)
+                match['score_breakdown'][color][f'_teleopReef_trough'] = max(match.get('score_breakdown',{}).get(color,{}).get('teleopReef',{}).get("trough",0) - match['score_breakdown'][color][f'_autoReef_trough'],0)
         return played_matches, teams
 
     def adjust_algae(self, played_matches:list, teams:dict):

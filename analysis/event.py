@@ -91,6 +91,8 @@ class Event():
         teams = smart_solve(played_matches, teams, smart_solve_stats)
         teams = linked_solve(played_matches, teams, link_solve_stats)
 
+        
+
         for stat in self.game.stats:
             if stat.solve_strategy in [SMART_SOLVER, LINKED_SOLVER]:
                 continue
@@ -105,7 +107,7 @@ class Event():
                 pass
             else:
                 print("Unable to Solve Stat:", stat.stat_key, "Unknown Solution Strategy", stat.solve_strategy )
-        
+
         self.save_team_stats(teams, self.game.stats)
         return teams
 
