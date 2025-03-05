@@ -213,7 +213,31 @@ class Reefscape2025(FRCGame):
                 '_teleopReef_trough',
             ]),
 
-            
+            SumStat('l4CorralScored',[
+                'autoL4Corral',
+                'teleopL4Corral',
+            ]),
+
+            SumStat('l3CorralScored',[
+                'autoL3Corral',
+                'teleopL3Corral',
+            ]),
+
+            SumStat('l2CorralScored',[
+                'autoL2Corral',
+                'teleopL2Corral',
+            ]),
+
+            SumStat('l1CorralScored',[
+                '_autoReef_trough',
+                '_teleopReef_trough',
+            ]),
+
+            SumStat('teleopElementsScored',[
+                'teleopCorralScored',
+                '_teamNetAlgae',
+                'wallAlgaeCount',
+            ]),            
 
             SumStat('totalCoralScored',[
                 'autoCorralScored',
@@ -275,21 +299,27 @@ class Reefscape2025(FRCGame):
             Chart('OPR', [
                 ChartField('teleopPoints', display_text='Teleop'),
                 ChartField('autoPoints', display_text='Auto'),
-                ChartField('endgamePoints', display_text='EndGame'),
-                ChartField('linkPoints', display_text='Links')],
+                ChartField('endgamePoints', display_text='EndGame')],
             ),
-            Chart('Elements Scoring Location', [
-                ChartField('elementsLow', display_text='Low'),
-                ChartField('elementsMid', display_text='Middle'),
-                ChartField('elementsHigh', display_text='High')],
+            Chart('Corral Scoring Location', [
+                ChartField('l4CorralScored', display_text='L4'),
+                ChartField('l3CorralScored', display_text='L3'),
+                ChartField('l2CorralScored', display_text='L2'),
+                ChartField('l1CorralScored', display_text='L1'),
+                ],
+            ),
+            Chart('Algae Scoring Location', [
+                ChartField('_teamNetAlgae', display_text='Net'),
+                ChartField('wallAlgaeCount', display_text='Processor'),
+                ],
             ),
             Chart('Elements Scoring Period', [
-                ChartField('autoElementsScored', display_text='Auto'),
+                ChartField('autoCorralScored', display_text='Auto'),
                 ChartField('teleopElementsScored', display_text='Teleop')],
             ),
             Chart('Elements Scoring Type', [
-                ChartField('cones', display_text='Cones'),
-                ChartField('cubes', display_text='Cubes')],
+                ChartField('totalCoralScored', display_text='Corral'),
+                ChartField('totalAlgaeScored', display_text='Algae')],
             ),
         ]
 
