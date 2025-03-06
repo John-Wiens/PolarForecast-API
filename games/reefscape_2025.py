@@ -260,7 +260,7 @@ class Reefscape2025(FRCGame):
                 '_autoReef_trough',
                 'autoLine',
             ], weights = [
-                7,6,4,3,3
+                7,6,4,3,1
             ],display_name="Auto", report_stat = True, order = 3),
 
             SumStat('teleopPoints',[
