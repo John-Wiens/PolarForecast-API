@@ -149,10 +149,10 @@ def read_item():
 #         raise HTTPException(status_code=404, detail="Could not find the supplied key in the database.")
 #     response = source.clean_response(data, remove_metadata = not include_metadata, remove_intermediate = False)
 #     return response
-@app.on_event("startup")
-def update_once():
-    if FORCE_BACKPOP_ONCE:
-        update(force_update=True)
+#@app.on_event("startup")
+#def update_once():
+#    if FORCE_BACKPOP_ONCE:
+#        update(force_update=True)
 
 
 @app.on_event("startup")
