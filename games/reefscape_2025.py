@@ -522,7 +522,8 @@ class Reefscape2025(FRCGame):
 
         result_time = match.get('post_result_time',-1)
         if result_time != None and result_time > 0 :
-            prediction[f"{color}_actual_score"] = match.get('alliances',{}).get(color,{}).get('score',-1)
+            prediction[f"blue_actual_score"] = match.get('alliances',{}).get('blue',{}).get('score',-1)
+            prediction[f"red_actual_score"] = match.get('alliances',{}).get('red',{}).get('score',-1)
 
 
 
