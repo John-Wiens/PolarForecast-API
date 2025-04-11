@@ -53,21 +53,24 @@ def update(force_update = False):
             #    update_event(event)
 
 
-            # if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"]:
+            if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"] or today >= start and today <= end:
+                update_event(event)
 
             # if event['event_code'] == 'cokc' or event['event_code'] == 'cocri' or event['event_code'] == 'coden':
             #if today >= start:
             #if today >= start and today <= end:
             # if event['event_type'] == 2:
-            if event['event_code'] =='code':
-                update_event(event)
+            # if event['event_code'] =='code':
+            #     update_event(event)
                 
             
 
         except Exception as e:
             print("Error:", e)
             traceback.print_exc()
+    print("Updating Search Key Cache")
     update_search_key_cache()
+    print("Search Key Cache Update Complete")
     pass
 
 def update_global():

@@ -358,8 +358,8 @@ class Reefscape2025(FRCGame):
             red_total_net_algae = match.get('score_breakdown',{}).get('red',{}).get('netAlgaeCount',0)
             blue_total_net_algae = match.get('score_breakdown',{}).get('blue',{}).get('netAlgaeCount',0)
 
-            match['score_breakdown']['red'][f'_teamNetAlgae'] = max(blue_total_net_algae - red_processor_algae,0)
-            match['score_breakdown']['blue'][f'_teamNetAlgae'] = max(red_total_net_algae - blue_processor_algae,0)
+            match['score_breakdown']['red'][f'_teamNetAlgae'] = max(red_total_net_algae - blue_processor_algae,0)
+            match['score_breakdown']['blue'][f'_teamNetAlgae'] = max(blue_total_net_algae - red_processor_algae,0)
 
         return played_matches, teams
 
