@@ -393,7 +393,7 @@ class Reefscape2025(FRCGame):
             ranks[team] = []
             rps[team] = []
 
-        num_sims = 1000
+        num_sims = 100
         for i in range(0,num_sims):
             simulated_schedules = get_random_schedule(teams, len(clean_matches))
             simulated_rps = simulate_event(simulated_schedules, teams, self.predict_match, self.parse_rps)
