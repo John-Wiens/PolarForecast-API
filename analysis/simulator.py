@@ -94,13 +94,15 @@ def simulate_event(matches:list, teams:dict, prediction_function, rp_function):
             if team not in blue_surrogates:
                 rps[team] += blue_rp
             else:
-                print("Skipping Blue Surrogate", team)
+                pass
+                #print("Skipping Blue Surrogate", team)
         
         for team in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
             if team not in red_surrogates:
                 rps[team] += red_rp
             else:
-                print("Skipping Red Surrogate", team)
+                pass
+                #print("Skipping Red Surrogate", team)
 
     return rps
             
