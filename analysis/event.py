@@ -45,7 +45,7 @@ class Event():
         print(f"    Updated {len(self.teams)} Teams.")
         self.update_match_predictions()
         print(f"    Updated Match Predictions.")
-        # self.ml()
+        
 
     def ml(self):
         with open('ml.csv', 'w') as ml:
@@ -75,6 +75,7 @@ class Event():
     # Update Team Performances Based on Latest available TBA Data
     def update_team_info(self):
         matches = self.get_sanitized_matches(self.tba_matches)
+        print(matches[0])
         played_matches = self.get_played_matches(matches)
         teams = self.create_team_lookup(self.tba_teams, self.tba_rankings, matches)
         if len(teams) == 0:
