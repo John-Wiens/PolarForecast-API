@@ -106,8 +106,9 @@ class Rebuilt2026(FRCGame):
 
     # Assigns Event Rankings to all the Teams at the event
     def assign_ranks(self, played_matches:list, teams:list, stat:dict, rankings:dict)-> dict:
-        for rank in rankings.get('rankings', []):
-            teams[rank['team_key']]['rank'] = rank['rank']
+        if rankings is not None:
+            for rank in rankings.get('rankings', []):
+                teams[rank['team_key']]['rank'] = rank['rank']
         return teams
 
     def validate_match(self, match:dict) -> bool:
