@@ -218,12 +218,12 @@ class Rebuilt2026(FRCGame):
         prediction[f"{color}_tower"] = total_tower
 
 
-        if total_fuel >= 100:
+        if total_fuel >= 360:
             prediction[f"{color}_energized_rp"] = 1
         else:
             prediction[f"{color}_energized_rp"] = 0
 
-        if total_fuel >= 360:
+        if total_fuel >= 100:
             prediction[f"{color}_supercharged_rp"] = 1
         else:
             prediction[f"{color}_supercharged_rp"] = 0

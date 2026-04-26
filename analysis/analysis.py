@@ -49,19 +49,19 @@ def update(force_update = False):
 
             # Fix Missing Data
             if force_update or ENABLE_BACKPOP and end < today and not event['key'] in keys:
-               print("Updating Missing Data", event['key'])
+            #    print("Updating Missing Data", event['key'])
                update_event(event)
 
 
-            #if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"]:# or today >= start and today <= end:
-            #    update_event(event)
+            if event['event_code'] in ["hop", "new", "gal", "joh", "arc", "cur","dal","mil","cmptx"] or today >= start and today <= end:
+                update_event(event)
 
             # if event['event_code'] == 'week0':
             #if today >= start:
-            if today >= start and today <= end:
+            #if today >= start and today <= end:
             # if event['event_type'] == 2:
             # if event['event_code'] =='code':
-                update_event(event)
+            #    update_event(event)
                 
             
 
@@ -71,16 +71,21 @@ def update(force_update = False):
     print("Updating Search Key Cache")
     update_search_key_cache()
     print("Search Key Cache Update Complete")
+    print("Event Update Results: Complete.")
+    print(get_event_stats_index(2026))
     pass
 
 def update_global():
+    print("Updating Global Team Ranks")
     today = datetime.now()
-    events = get_year_event_list_tba(6)
+    events = get_year_event_list_tba(2026)
+
     events = sorted(events, key=lambda d: get_as_date(d['end_date']), reverse = False)
     keys = [elem.get('key','missing') for elem in get_all_search_keys()['data']]
     teams = {}
     for event in events:
-        if get_as_date(event.get('end_date')) <  today:
+        print(event)
+        if get_as_date(event.get('end_date')) < today:
             new_teams = get_year_event_team_index(2026, event.get('event_code'))
             
                 
@@ -106,6 +111,9 @@ def update_global():
         # if i > 100:
         #     break
     ranks = {'data': team_list}
+
+    print("Storing Global Team Ranks",ranks)
+
     store_year_team_ranks(2026, ranks)
 
 if __name__ == '__main__':
