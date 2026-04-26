@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  api:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: >-
+      bash -c "pip install -r requirements.txt && python3 -m uvicorn pf_api:app --host 0.0.0.0 --port 8000"
+    environment:
+      PF_REDIS_HOST: redis
+      PF_REDIS_PORT: "6379"
+      PF_TBA_API_KEY: ${PF_TBA_API_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    restart: unless-stopped

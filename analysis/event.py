@@ -45,32 +45,7 @@ class Event():
         print(f"    Updated {len(self.teams)} Teams.")
         self.update_match_predictions()
         print(f"    Updated Match Predictions.")
-        # self.ml()
-
-    def ml(self):
-        with open('ml.csv', 'w') as ml:
-            count = 0
-            for match in self.tba_matches:
-                count +=1
-                for team_key in match.get('alliances',{}).get('blue',{}).get('team_keys',[]):
-                    auto = self.teams.get(team_key,{}).get('auto',0)
-                    cargo = self.teams.get(team_key,{}).get('cargo',0)
-                    endgame = self.teams.get(team_key,{}).get('endgame',0)
-                    ml.write(f'{auto},{cargo},{endgame},')
-                    
-
-                for team_key in match.get('alliances',{}).get('red',{}).get('team_keys',[]):
-                    auto = self.teams.get(team_key,{}).get('auto',0)
-                    cargo = self.teams.get(team_key,{}).get('cargo',0)
-                    endgame = self.teams.get(team_key,{}).get('endgame',0)
-                    ml.write(f'{auto},{cargo},{endgame},')
-
-
-
-
-                blue_score = match['score_breakdown']['blue']['totalPoints']
-                red_score = match['score_breakdown']['red']['totalPoints']
-                ml.write(f'{blue_score},{red_score}\n')
+        
 
     # Update Team Performances Based on Latest available TBA Data
     def update_team_info(self):
